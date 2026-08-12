@@ -80,10 +80,10 @@ const QUESTIONS: QuestionDef[] = [
     title: '每天通勤多久？',
     subtitle: '通勤是打工人的第二份工作',
     min: 0,
-    max: 120,
+    max: 360,
     unit: '分钟',
     minLabel: '0 分钟',
-    maxLabel: '120 分钟',
+    maxLabel: '360 分钟',
   },
   {
     key: 'salaryRange',

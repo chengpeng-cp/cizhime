@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
-import { ArrowRight, Sparkles, Users } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -48,11 +48,6 @@ export default function HomePage() {
         开始分析
         <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
       </button>
-
-      <div className="hero-footer mt-16 flex items-center gap-2 text-sm text-slate-500">
-        <Users size={16} />
-        <span>已有 13,666 人完成测试</span>
-      </div>
     </div>
   )
 }
