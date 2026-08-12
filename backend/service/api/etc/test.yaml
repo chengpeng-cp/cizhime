@@ -1,0 +1,32 @@
+# todo: 修改测试环境配置
+
+Name: api-test
+Host: 0.0.0.0
+Port: 8889
+
+Timeout: 30000
+MaxBytes: 10485760
+
+Auth:
+  AccessSecret: "test-secret-key-change-me"
+  AccessExpire: 3600
+
+DataSource: "root:test_password@tcp(localhost:3306)/cizhima_test?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai"
+
+MySQL:
+  MaxOpenConns: 10
+  MaxIdleConns: 5
+  ConnMaxLifetime: 300
+
+Redis:
+  - Host: "localhost:6379"
+    Pass: ""
+
+Log:
+  ServiceName: api-test
+  Mode: console
+  Level: debug
+  Encoding: plain
+  Path: logs
+  Compress: false
+  KeepDays: 1

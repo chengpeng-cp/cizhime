@@ -1,0 +1,54 @@
+# todo: 修改服务名称、端口、数据库配置等
+
+Name: api
+Host: 0.0.0.0
+Port: 8888
+
+Timeout: 60000
+MaxBytes: 10485760
+
+CorsAllowOrigins:
+  - "http://localhost:*"
+  - "http://127.0.0.1:*"
+
+Auth:
+  AccessSecret: "${JWT_SECRET}"
+  AccessExpire: 604800
+
+DataSource: "${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai"
+
+MySQL:
+  MaxOpenConns: 50
+  MaxIdleConns: 10
+  ConnMaxLifetime: 300
+
+Redis:
+  - Host: "${REDIS_HOST}:${REDIS_PORT}"
+    Pass: "${REDIS_PASSWORD}"
+
+Log:
+  ServiceName: api
+  Mode: file
+  Level: info
+  Encoding: json
+  Path: logs
+  Compress: true
+  KeepDays: 7
+  StackCoolDownMillis: 100
+
+Telemetry:
+  Name: api
+  Endpoint: localhost:4317
+  Sampler: 1.0
+  Batcher: otlpgrpc
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 9091
+  Path: /metrics
+
+AI:
+  Provider: "${AI_PROVIDER}"    # deepseek/dashscope/moonshot/openai/custom
+  APIKey: "${AI_API_KEY}"
+  BaseURL: "${AI_BASE_URL}"     # 可选，custom 时必填；其他 provider 不填使用预设
+  Model: "${AI_MODEL}"          # 可选，不填使用预设默认模型

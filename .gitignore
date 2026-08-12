@@ -1,0 +1,124 @@
+# =============================================================================
+# 根级 .gitignore —— 与 backend/.gitignore、frontend/.gitignore 共同生效
+# 目标：仅提交业务代码与必要配置模板，屏蔽 IDE、构建产物、日志与密钥
+# =============================================================================
+
+# -------------------- 操作系统 --------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# -------------------- IDE / 编辑器 --------------------
+.trae/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# -------------------- AI / 内部工具产物 --------------------
+# skills 为内部 skill 定义，不属于业务代码
+skills/
+# Trae / AI 会话与缓存
+.trae-*
+
+# -------------------- 内部文档（按需保留 README） --------------------
+# docs 目录为内部协作文档（PRD/SOP/代码规则等），不对外公开
+docs/
+# 后端 swagger 为生成产物，按需保留；如需提交可注释下一行
+backend/docs/swagger/
+
+# -------------------- 环境变量 / 密钥 / 凭证 --------------------
+# 任何 .env 真实配置均不提交，仅保留 .env.example / .env.infra.example 等模板
+.env
+.env.*
+!.env.example
+!.env.infra.example
+!.env.*.example
+# 部署环境真实凭证
+backend/deploy/.env.infra
+backend/deploy/.env.*
+!backend/deploy/.env.infra.example
+!backend/deploy/.env.*.example
+# 密钥 / 证书 / 私钥
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.keystore
+*.jks
+*.asc
+secrets/
+secrets.json
+*secret*.yaml
+*secret*.yml
+*secret*.json
+id_rsa
+id_rsa.pub
+*credentials*
+
+# -------------------- 日志 --------------------
+logs/
+*.log
+*.log.*
+backend/logs/
+
+# -------------------- 前端构建产物与依赖 --------------------
+node_modules/
+dist/
+build/
+.vite/
+.turbo/
+.next/
+.nuxt/
+.parcel-cache/
+coverage/
+*.lcov
+.eslintcache
+.stylelintcache
+
+# -------------------- 后端构建产物 --------------------
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+# 编译缓存
+*.cover
+go.work.sum
+
+# -------------------- 容器 / 部署临时 --------------------
+# 不屏蔽 docker-compose.yml 与 Dockerfile（属于业务部署配置）
+mysql-data/
+redis-data/
+*.tar
+*.gz
+*.zip
+# 本地基础设施数据卷
+backend/deploy/mysql-init-scripts/*.sql.local
+
+# -------------------- 数据库 / 数据文件 --------------------
+*.sqlite
+*.sqlite3
+*.db
+*.sql.bak
+dump.rdb
+
+# -------------------- 临时 / 缓存 --------------------
+tmp/
+temp/
+.cache/
+*.tmp

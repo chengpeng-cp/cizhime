@@ -1,0 +1,80 @@
+# 基础设施编排（密码等敏感信息通过 .env.infra 文件加载）
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cileme-mysql
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-cileme}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init-scripts:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+    networks:
+      - cileme-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cileme-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    restart: unless-stopped
+    networks:
+      - cileme-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: cileme-adminer
+    ports:
+      - "${ADMINER_PORT:-8085}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+      ADMINER_DESIGN: pepa-linha-dark
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - cileme-network
+
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: cileme-redis-insight
+    ports:
+      - "${REDIS_INSIGHT_PORT:-5540}:5540"
+    volumes:
+      - redisinsight_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - cileme-network
+
+volumes:
+  mysql_data:
+  redis_data:
+  redisinsight_data:
+
+networks:
+  cileme-network:
+    name: cileme-network
+    driver: bridge

@@ -1,0 +1,74 @@
+syntax = "v1"
+
+info (
+	title:   "辞职么"
+	desc:    "辞职么 - AI 辅助辞职决策工具"
+	author:  "joyy"
+	email:   "joyy@cizhima.com"
+	version: "v1.0.0"
+)
+
+type (
+	EmptyResponse  {}
+	ListPageRequest {
+		Page     int    `form:"page,default=1"`
+		PageSize int    `form:"page_size,default=20"`
+		Keyword  string `form:"keyword,optional"`
+	}
+)
+
+// 报告相关
+type (
+	QuestionnaireRequest {
+		Education          string `json:"education"` // 学历
+		Region             string `json:"region"` // 地区
+		Stability          string `json:"stability"` // 稳定程度
+		OvertimeFrequency  string `json:"overtimeFrequency"` // 加班频率
+		CommuteMinutes     int    `json:"commuteMinutes"` // 通勤分钟数
+		SalaryRange        string `json:"salaryRange"` // 薪资范围
+		SalarySatisfaction int    `json:"salarySatisfaction"` // 薪资满意度1-10
+		WorkEnvironment    string `json:"workEnvironment"` // 办公环境
+		ColleagueRelation  string `json:"colleagueRelation"` // 同事关系
+		BossToxicity       int    `json:"bossToxicity"` // 领导二逼程度1-10
+		ExtraNote          string `json:"extraNote,optional"` // 用户自由补充内容
+	}
+	AnalyzeRequest {
+		AgentStyle    string               `json:"agentStyle"` // Agent风格
+		Questionnaire QuestionnaireRequest `json:"questionnaire"` // 问卷数据
+	}
+	GetReportRequest {
+		ShareCode string `path:"shareCode"` // 分享码
+	}
+	Analysis {
+		Income      string `json:"income"`
+		Workload    string `json:"workload"`
+		Environment string `json:"environment"`
+		Growth      string `json:"growth"`
+	}
+	ReportResponse {
+		ShareCode  string   `json:"shareCode"`
+		Verdict    string   `json:"verdict"`
+		Score      int      `json:"score"`
+		Summary    string   `json:"summary"`
+		Highlights []string `json:"highlights"`
+		Warnings   []string `json:"warnings"`
+		Analysis   Analysis `json:"analysis"`
+		Advice     []string `json:"advice"`
+		Roast      string   `json:"roast"`
+	}
+)
+
+@server (
+	prefix: /api/v1
+)
+service api {
+	@handler healthHandler
+	get /health returns (EmptyResponse)
+
+	@handler analyzeHandler
+	post /analyze (AnalyzeRequest) returns (ReportResponse)
+
+	@handler getReportHandler
+	get /report/:shareCode (GetReportRequest) returns (ReportResponse)
+}
+

@@ -1,0 +1,20 @@
+CREATE TABLE `reports` (
+    `id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `share_code`    VARCHAR(16) NOT NULL DEFAULT '' COMMENT '分享短码（唯一）',
+    `agent_style`   VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'Agent风格',
+    `questionnaire` JSON NOT NULL COMMENT '问卷数据JSON',
+    `verdict`       VARCHAR(32) NOT NULL DEFAULT '' COMMENT '判定结果',
+    `score`         INT NOT NULL DEFAULT 0 COMMENT '辞职指数0-100',
+    `summary`       TEXT COMMENT '一句话总结',
+    `highlights`    JSON COMMENT '亮点数组',
+    `warnings`      JSON COMMENT '槽点数组',
+    `analysis`      JSON COMMENT '多维度分析',
+    `advice`        JSON COMMENT '建议数组',
+    `roast`         TEXT COMMENT '毒舌总结',
+    `raw_response`  TEXT COMMENT 'AI原始返回',
+    `create_time`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_share_code` (`share_code`),
+    KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='辞职么报告表';
