@@ -1,175 +1,200 @@
-# 辞职么 前后端分离开发脚手架
+# 辞职么
 
-基于 go-zero + React + TypeScript 的优秀前后端分离开发脚手架，提取自生产项目，可直接用于快速搭建新项目。
+> AI 辅助辞职决策工具 —— 填一份问卷，让 AI 帮你理性评估"该不该辞职"。
 
-## 项目结构
+辞职么通过结构化问卷采集用户的学历、地区、薪资、加班、通勤、办公环境、同事关系、领导风格等维度信息，调用大模型进行多维度分析，生成包含评分、总结、亮点、风险、建议与"吐槽"的个性化报告，并支持通过分享码一键分享。
 
-```
-辞职么/
-├── backend/          # go-zero 后端脚手架
-└── frontend/         # React 前端脚手架
-```
+## 功能特性
+
+- **结构化问卷**：覆盖收入、工作量、环境、成长四大维度的标准化采集
+- **AI 多维分析**：大模型对问卷数据综合评估，输出客观评分与文字结论
+- **可视化报告**：评分、总结、亮点、警告、分维度分析、行动建议、吐槽一应俱全
+- **分享码机制**：每份报告生成唯一分享码，便于朋友参考决策
+- **多 Agent 风格**：支持不同的 AI 表达风格（毒舌 / 温和 / 理性等）
+- **多 AI Provider**：支持 DeepSeek、通义 DashScope、Moonshot、OpenAI 及自定义接入
+- **响应式 UI**：基于 Tailwind CSS 的现代界面，支持亮/暗主题与动画交互
 
 ## 技术栈
 
 ### 后端
-- **框架**: go-zero v1.10.1
-- **数据库**: MySQL 8.0 + Redis 7
-- **认证**: JWT
-- **代码生成**: goctl
-- **部署**: Docker + Docker Compose
+- **框架**：[go-zero](https://github.com/zeromicro/go-zero) v1.10.1
+- **语言**：Go 1.26
+- **存储**：MySQL 8 + Redis 7
+- **认证**：JWT（含 Token 自动刷新）
+- **限流**：滑动窗口限流中间件
+- **代码生成**：goctl（API / Model / Swagger）
+- **AI 接入**：可插拔 Provider 架构
+- **部署**：Docker + Docker Compose
 
 ### 前端
-- **框架**: React 19 + TypeScript + Vite 7
-- **状态管理**: Redux Toolkit
-- **UI样式**: Tailwind CSS 4
-- **路由**: React Router DOM 7
-- **HTTP**: Axios（含Token自动刷新）
+- **框架**：React 19 + TypeScript + Vite 7
+- **状态管理**：Redux Toolkit + React Query
+- **样式**：Tailwind CSS 4
+- **路由**：React Router DOM 7（含路由保护）
+- **HTTP**：Axios（含 Token 自动刷新、401 重试）
+- **动画**：GSAP
+- **图标**：lucide-react
+
+## 项目结构
+
+```
+cizhime/
+├── backend/                  # 后端服务（go-zero）
+│   ├── service/api/          # API 服务
+│   │   ├── api.api           # API 接口定义（源文件）
+│   │   ├── api.go            # 服务入口
+│   │   └── internal/         # handler / logic / middleware / svc / types
+│   ├── pkg/                  # 公共包（errno / response / crypto / model / env）
+│   ├── deploy/               # Docker Compose 编排
+│   ├── docker/               # Dockerfile
+│   ├── scripts/              # 工具脚本
+│   └── Makefile              # 构建、生成、运行命令
+├── frontend/                 # 前端应用（React + Vite）
+│   └── src/
+│       ├── pages/            # home / survey / generating / report / error
+│       ├── components/       # 通用组件与布局
+│       ├── services/         # API 请求封装
+│       ├── store/            # Redux 状态管理
+│       ├── router/           # 路由配置
+│       ├── types/            # TS 类型定义
+│       └── utils/            # 工具函数（请求封装、Token 存储等）
+└── README.md
+```
 
 ## 快速开始
 
 ### 环境要求
-- Go 1.26+
-- Node.js 20+
-- Docker & Docker Compose
 
-### 启动后端
+- **Go** 1.26+
+- **Node.js** 20+
+- **Docker & Docker Compose**（用于启动 MySQL + Redis）
+- 一个可用的 AI API Key（DeepSeek / DashScope / Moonshot / OpenAI 任选其一）
+
+### 1. 克隆仓库
+
+```bash
+git clone https://github.com/chengpeng-cp/cizhime.git
+cd cizhime
+```
+
+### 2. 启动后端
 
 ```bash
 cd backend
 
-# 1. 复制环境变量配置文件
+# 1) 复制环境变量配置，并填写真实值（DB / Redis / JWT / AI API Key）
 cp .env.example .env
-# todo: 修改 .env 中的配置值
+# 编辑 .env，把 ${CHANGE_ME_*} 占位符替换为真实值
 
-# 2. 启动基础设施（MySQL + Redis）
+# 2) 复制基础设施配置，并填写 MySQL/Redis 密码
+cp deploy/.env.infra.example deploy/.env.infra
+# 编辑 deploy/.env.infra
+
+# 3) 启动基础设施（MySQL + Redis，并自动导入表结构）
 make infra-up
 
-# 3. 安装 goctl 工具
+# 4) 安装 goctl 代码生成工具
 make install
 
-# 4. 生成 API 和 Model 代码
+# 5) 生成 API / Model / Swagger 代码
 make gen
 
-# 5. 运行服务
+# 6) 运行服务
 make run
 ```
 
-### 启动前端
+服务默认监听 `http://localhost:8888`，健康检查接口：`GET /api/v1/health`。
+
+### 3. 启动前端
 
 ```bash
 cd frontend
 
-# 1. 安装依赖
+# 1) 安装依赖
 npm install
 
-# 2. 复制环境变量配置文件
+# 2) 复制环境变量，配置后端 API 地址
 cp .env.example .env
-# todo: 修改 .env 中的 API 地址
+# 编辑 .env，设置 VITE_API_BASE_URL=http://localhost:8888
 
-# 3. 启动开发服务器
+# 3) 启动开发服务器
 npm run dev
 ```
 
-## 关键文件说明
+前端默认运行在 `http://localhost:5173`。
+
+## 配置说明
+
+### 后端环境变量（`backend/.env`）
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | MySQL 连接信息 | `localhost` / `3306` / `root` / `***` / `cizhima` |
+| `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` | Redis 连接信息 | `localhost` / `6379` / `***` |
+| `JWT_SECRET` | JWT 签名密钥（≥32 字符） | 随机字符串 |
+| `AI_PROVIDER` | AI 服务商 | `deepseek` / `dashscope` / `moonshot` / `openai` / `custom` |
+| `AI_API_KEY` | AI 服务 API Key | `sk-***` |
+| `AI_BASE_URL` / `AI_MODEL` | 可选，自定义接入地址与模型 | — |
+
+### 前端环境变量（`frontend/.env`）
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `VITE_API_BASE_URL` | 后端 API 基础地址 | `http://localhost:8888` |
+
+> 真实配置文件（`.env`、`.env.infra`）已在 `.gitignore` 中屏蔽，仅提交 `.example` 模板。
+
+## API 接口
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| `GET` | `/api/v1/health` | 健康检查 |
+| `POST` | `/api/v1/analyze` | 提交问卷并生成分析报告 |
+| `GET` | `/api/v1/report/:shareCode` | 通过分享码获取报告 |
+
+请求/响应结构详见 `backend/service/api/api.api`，启动后可在 `backend/docs/swagger/api.json` 查看 Swagger 文档。
+
+## 常用命令
 
 ### 后端
-| 文件 | 说明 |
-|------|------|
-| `service/api/api.api` | API 接口定义（源文件） |
-| `service/api/api.go` | 服务入口 |
-| `pkg/errno/errno.go` | 错误码体系 |
-| `pkg/response/response.go` | 统一响应封装 |
-| `pkg/crypto/aes.go` | AES-GCM 加密工具 |
-| `internal/middleware/jwtauthmiddleware.go` | JWT 认证中间件 |
-| `internal/middleware/ratelimitmiddleware.go` | 限流中间件 |
-| `Makefile` | 构建、生成、运行命令 |
-| `deploy/docker-compose.base.yml` | 基础设施编排 |
 
-### 前端
-| 文件 | 说明 |
-|------|------|
-| `src/utils/request.ts` | Axios 请求封装（含Token自动刷新） |
-| `src/utils/authStorage.ts` | Token 本地存储工具 |
-| `src/store/index.ts` | Redux Store 配置 |
-| `src/router/index.tsx` | 路由配置（含 ProtectedRoute 示例） |
-| `src/App.tsx` | 根组件（含 ErrorBoundary、ThemeProvider） |
-
-## 使用新项目的步骤
-
-1. 复制 `辞职么` 目录到新项目
-2. 全局替换 `辞职么-backend` 为你的模块名
-3. 全局替换 `辞职么` 为你的项目名
-4. 按照文件中的 `todo: ` 标注逐一修改配置
-5. 根据业务需求扩展 API 接口和页面组件
-
-## 业务接入指南
-
-脚手架仅包含基础设施（HTTP 封装、JWT 中间件、限流、错误码、主题切换、错误边界等），不包含任何业务代码。以下是接入业务的步骤。
-
-### 后端：添加业务接口
-
-1. 在 `service/api/api.api` 中定义接口（参考文件中的注释示例）
-2. 执行 `make gen-api` 生成 handler、logic、types 代码
-3. 在 `internal/logic/` 中实现业务逻辑
-4. 需要鉴权的接口，在 `api.api` 中添加 `middleware: JwtAuth` 配置块
-
-### 后端：添加数据表
-
-1. 在 `pkg/model/sql/` 下创建 `.sql` 文件定义表结构
-2. 执行 `make gen-model` 生成 model 代码
-3. 执行 `make db-import` 导入表到数据库
-4. 在 `ServiceContext` 中注入 model，在 logic 中使用
-
-### 后端：实现登录认证
-
-脚手架提供了 JWT 中间件（`internal/middleware/jwtauthmiddleware.go`），但不包含登录注册接口。接入步骤：
-
-1. 在 `api.api` 中定义登录/注册接口
-2. 执行 `make gen-api` 生成代码
-3. 在 logic 中实现：验证账号密码 -> 生成 JWT（使用 `config.Auth.AccessSecret`）-> 返回 token
-4. 前端通过 `authStorage.setToken()` 保存 token
-
-### 前端：添加业务页面
-
-1. 在 `src/pages/` 下创建页面组件
-2. 在 `src/router/index.tsx` 中添加路由
-3. 需要鉴权的路由，使用 `ProtectedRoute` 包裹
-
-### 前端：添加 API 调用
-
-1. 在 `src/types/api.ts` 中定义请求/响应类型
-2. 在 `src/services/` 下创建 service 文件，使用 `get/post/put/del` 封装
-3. 在 `services/index.ts` 中统一导出
-
-### 前端：添加状态管理
-
-1. 在 `src/store/modules/` 下创建 slice
-2. 在 `src/store/index.ts` 中注册 reducer
-3. 组件中通过 `useSelector/useDispatch` 使用
-
-### 前端：处理认证过期
-
-`request.ts` 在 token 刷新失败时会触发 `auth:expired` 事件。业务方可以监听此事件跳转登录页：
-
-```tsx
-useEffect(() => {
-  const handler = () => {
-    // 跳转登录页
-    navigate('/login', { replace: true })
-  }
-  window.addEventListener('auth:expired', handler)
-  return () => window.removeEventListener('auth:expired', handler)
-}, [])
+```bash
+make install      # 安装 goctl
+make gen          # 生成 API / Model / Swagger 代码
+make run          # 运行服务
+make build        # 构建二进制到 bin/
+make test         # 运行测试
+make lint         # 代码检查
+make infra-up     # 启动基础设施
+make infra-down   # 停止基础设施
+make docker       # 构建 Docker 镜像
+make clean        # 清理构建产物
 ```
 
-## 标注说明
+### 前端
 
-脚手架中所有需要修改的地方都标注了 `todo: 要执行的修改` 注释，包括：
-- 项目名、模块名
-- 数据库配置
-- API 地址
-- 容器名称
-- 环境变量
-- 业务错误码
-- 页面标题等
+```bash
+npm run dev       # 启动开发服务器
+npm run build     # 构建生产版本
+npm run preview   # 预览生产构建
+npm run lint      # 代码检查
+npm run lint:fix  # 自动修复
+npm run format    # 代码格式化
+```
+
+## 部署
+
+后端支持 Docker 部署，前端构建后可由任意静态资源服务器（Nginx / CDN）托管：
+
+```bash
+# 后端：构建镜像
+cd backend && make docker
+
+# 前端：构建产物
+cd frontend && npm run build
+# 产物位于 frontend/dist/，部署到 Nginx 或静态托管
+```
+
+## License
+
+本项目基于 [MIT License](LICENSE) 开源，欢迎使用、修改与分发。

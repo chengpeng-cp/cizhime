@@ -11,6 +11,7 @@ import (
 	"cizhima-backend/service/api/internal/middleware"
 
 	"github.com/cloudwego/eino/components/model"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
@@ -58,6 +59,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	chatModel, err := ai.NewChatModel(context.Background(), &c.AI)
 	if err != nil {
 		// AI 服务不可用不应阻止服务启动，logic 层会处理 nil ChatModel
+		logx.Errorf("AI ChatModel 初始化失败，analyze 接口将不可用: %v", err)
 		chatModel = nil
 	}
 

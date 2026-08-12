@@ -31,3 +31,9 @@ Log:
   Compress: true
   KeepDays: 30
   StackCoolDownMillis: 100
+
+AI:
+  Provider: "${AI_PROVIDER}"     # deepseek/dashscope/moonshot/openai/custom
+  APIKey: "${AI_API_KEY}"
+  BaseURL: "${AI_BASE_URL}"      # 可选，custom 时必填；其他 provider 不填使用预设
+  Model: "${AI_MODEL}"           # 可选，不填使用预设默认模型

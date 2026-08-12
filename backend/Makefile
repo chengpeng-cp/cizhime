@@ -88,10 +88,19 @@ tidy: ## go mod tidy
 # 构建
 # ==============================================================================
 .PHONY: build
-build: ## 构建 API 服务
+build: ## 构建 API 服务（本机平台）
 	@echo "$(CYAN)构建 API 服务...$(RESET)"
 	@mkdir -p bin
-	$(GO) build -ldflags "-s -w -X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT)" -o bin/api ./service/api/
+	$(GO) build -ldflags "-s -w -X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT)" -o bin/api-local ./service/api/
+	@echo "$(GREEN)✓ bin/api-local$(RESET)"
+
+LINUX_ARCH ?= amd64
+
+.PHONY: build-linux
+build-linux: ## 构建 Linux 二进制（用于服务器部署，默认 amd64，可 LINUX_ARCH=arm64）
+	@echo "$(CYAN)构建 Linux $(LINUX_ARCH) 二进制...$(RESET)"
+	@mkdir -p bin
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(LINUX_ARCH) $(GO) build -ldflags "-s -w -X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT)" -o bin/api ./service/api/
 	@echo "$(GREEN)✓ bin/api$(RESET)"
 
 # ==============================================================================
