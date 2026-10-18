@@ -1,8 +1,8 @@
-import { lazy } from 'react'
+import { lazy, type ComponentType } from 'react'
 import { type RouteObject } from 'react-router-dom'
 import MainLayout from '@/components/layout/MainLayout'
 
-const lazyLoad = (importFn: () => Promise<{ default: React.ComponentType<any> }>) => {
+const lazyLoad = (importFn: () => Promise<{ default: ComponentType }>) => {
   return lazy(importFn)
 }
 

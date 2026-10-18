@@ -231,11 +231,11 @@ export default function SurveyPage() {
     <div ref={root} className="mx-auto max-w-2xl py-4">
       {/* 进度条 */}
       <div className="mb-8">
-        <div className="mb-2 flex items-center justify-between text-sm text-slate-400">
+        <div className="mb-2 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
           <span>{isAgentStep ? '选择分析风格' : isExtraStep ? '补充说明' : `第 ${step + 1} / ${TOTAL} 题`}</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-700">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-slate-700">
           <div
             className="h-full rounded-full bg-amber-400 transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -247,7 +247,7 @@ export default function SurveyPage() {
       {step > 0 && !loading && (
         <button
           onClick={goBack}
-          className="mb-4 inline-flex items-center gap-1 text-sm text-slate-400 transition-colors hover:text-amber-400"
+          className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 transition-colors hover:text-amber-500 dark:hover:text-amber-400"
         >
           <ArrowLeft size={16} /> 上一题
         </button>
@@ -256,9 +256,9 @@ export default function SurveyPage() {
       {/* 步骤内容 */}
       <div className="survey-step">
         {!isAgentStep && !isExtraStep && current && (
-          <div className="rounded-3xl border border-slate-700 bg-slate-800/50 p-6 shadow-xl sm:p-8">
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">{current.title}</h2>
-            <p className="mt-2 text-sm text-slate-400">{current.subtitle}</p>
+          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8 dark:border-slate-700 dark:bg-slate-800/50">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">{current.title}</h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{current.subtitle}</p>
 
             <div className="mt-8">
               {current.type === 'single' && current.options && (
@@ -271,8 +271,8 @@ export default function SurveyPage() {
                         onClick={() => handleSingleSelect(current.key, opt.value)}
                         className={`rounded-2xl border px-5 py-4 text-left text-lg transition-all ${
                           selected
-                            ? 'border-amber-400 bg-amber-400/15 text-amber-300'
-                            : 'border-slate-600 bg-slate-700/40 text-slate-200 hover:border-amber-400/50 hover:bg-slate-700'
+                            ? 'border-amber-400 bg-amber-400/15 text-amber-600 dark:text-amber-300'
+                            : 'border-gray-300 bg-gray-100 text-slate-700 hover:border-amber-400/50 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-700/40 dark:text-slate-200 dark:hover:bg-slate-700'
                         }`}
                       >
                         {opt.label}
@@ -285,10 +285,10 @@ export default function SurveyPage() {
               {current.type === 'slider' && (
                 <div>
                   <div className="mb-6 text-center">
-                    <span className="text-6xl font-black text-amber-400">
+                    <span className="text-6xl font-black text-amber-500 dark:text-amber-400">
                       {answers[current.key] as number}
                     </span>
-                    {current.unit && <span className="ml-2 text-xl text-slate-400">{current.unit}</span>}
+                    {current.unit && <span className="ml-2 text-xl text-slate-500 dark:text-slate-400">{current.unit}</span>}
                   </div>
                   <input
                     type="range"
@@ -315,9 +315,9 @@ export default function SurveyPage() {
         )}
 
         {isExtraStep && (
-          <div className="rounded-3xl border border-slate-700 bg-slate-800/50 p-6 shadow-xl sm:p-8">
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">还有什么想说的？</h2>
-            <p className="mt-2 text-sm text-slate-400">吐槽、抱怨、补充，随便写，AI 会一起分析</p>
+          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8 dark:border-slate-700 dark:bg-slate-800/50">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">还有什么想说的？</h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">吐槽、抱怨、补充，随便写，AI 会一起分析</p>
 
             <textarea
               value={extraNote}
@@ -325,7 +325,7 @@ export default function SurveyPage() {
               placeholder="比如：公司天天画大饼、领导PUA、同事甩锅、想转行但不知道做什么……"
               rows={6}
               maxLength={500}
-              className="mt-6 w-full resize-none rounded-2xl border border-slate-600 bg-slate-700/40 p-4 text-slate-200 placeholder:text-slate-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+              className="mt-6 w-full resize-none rounded-2xl border border-gray-300 bg-gray-100 p-4 text-slate-700 placeholder:text-slate-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 dark:border-slate-600 dark:bg-slate-700/40 dark:text-slate-200 dark:placeholder:text-slate-500"
             />
             <div className="mt-1 text-right text-xs text-slate-500">{extraNote.length}/500</div>
 
@@ -339,9 +339,9 @@ export default function SurveyPage() {
         )}
 
         {isAgentStep && (
-          <div className="rounded-3xl border border-slate-700 bg-slate-800/50 p-6 shadow-xl sm:p-8">
-            <h2 className="text-2xl font-bold text-white sm:text-3xl">选择你的&ldquo;人生导师&rdquo;</h2>
-            <p className="mt-2 text-sm text-slate-400">AI 会用这个风格来分析你</p>
+          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8 dark:border-slate-700 dark:bg-slate-800/50">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">选择你的&ldquo;人生导师&rdquo;</h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">AI 会用这个风格来分析你</p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {AGENT_STYLES.map((style) => {
@@ -353,21 +353,21 @@ export default function SurveyPage() {
                     className={`rounded-2xl border p-4 text-left transition-all ${
                       selected
                         ? 'border-amber-400 bg-amber-400/15'
-                        : 'border-slate-600 bg-slate-700/40 hover:border-amber-400/50'
+                        : 'border-gray-300 bg-gray-100 hover:border-amber-400/50 dark:border-slate-600 dark:bg-slate-700/40'
                     }`}
                   >
                     <div className="text-3xl">{style.emoji}</div>
-                    <div className={`mt-2 font-bold ${selected ? 'text-amber-300' : 'text-white'}`}>
+                    <div className={`mt-2 font-bold ${selected ? 'text-amber-600 dark:text-amber-300' : 'text-slate-900 dark:text-white'}`}>
                       {style.name}
                     </div>
-                    <div className="mt-1 text-xs text-slate-400">{style.description}</div>
+                    <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{style.description}</div>
                   </button>
                 )
               })}
             </div>
 
             {error && (
-              <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300">
                 <AlertCircle size={16} /> {error}
               </div>
             )}

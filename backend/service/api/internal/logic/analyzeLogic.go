@@ -10,6 +10,7 @@ import (
 	"math/rand"
 
 	"cizhima-backend/pkg/ai"
+	"cizhima-backend/pkg/env"
 	"cizhima-backend/pkg/errno"
 	"cizhima-backend/pkg/model/reports"
 	"cizhima-backend/service/api/internal/svc"
@@ -74,7 +75,28 @@ func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportRes
 	report, err := ai.Analyze(l.ctx, l.svcCtx.ChatModel, ai.AgentStyle(req.AgentStyle), questionnaire)
 	if err != nil {
 		l.Errorf("AI analyze failed: %v", err)
+		if env.IsProd() {
+			return nil, errno.ErrAIAnalyzeFailed
+		}
 		return nil, errno.ErrAIAnalyzeFailed.WithMessage(err.Error())
+	}
+
+	// 分数兜底到合法区间，避免 AI 返回越界值
+	if report.Score < 0 {
+		report.Score = 0
+	} else if report.Score > 100 {
+		report.Score = 100
+	}
+
+	// 切片兜底为空数组，避免 JSON 序列化为 null
+	if report.Highlights == nil {
+		report.Highlights = []string{}
+	}
+	if report.Warnings == nil {
+		report.Warnings = []string{}
+	}
+	if report.Advice == nil {
+		report.Advice = []string{}
 	}
 
 	// 5. 生成分享码

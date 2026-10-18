@@ -159,7 +159,7 @@ make run
 
 ```bash
 curl http://localhost:8888/api/v1/health
-# 返回 {"code":0,"message":"成功","data":{...}}
+# 返回 {"code":0,"message":"成功","data":{}}
 ```
 
 > 💡 想深入了解 goctl 代码生成？`make install` 安装 goctl，`make gen` 一键重新生成 API / Model / Swagger 代码（仓库中已包含生成好的代码，首次跑起来无需执行）。

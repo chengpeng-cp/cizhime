@@ -53,6 +53,12 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			Type: "node",
 			Pass: c.Redis[0].Pass,
 		})
+		// 启动时探测 Redis，配置错误尽早暴露（报告查询依赖 Redis 缓存）
+		if rds.PingCtx(context.Background()) {
+			logx.Infof("Redis 连接正常: %s", c.Redis[0].Host)
+		} else {
+			logx.Errorf("Redis 连接失败: %s，请检查 Redis 服务是否启动、端口与密码是否正确（报告查询将不可用）", c.Redis[0].Host)
+		}
 	}
 
 	// 创建 AI ChatModel

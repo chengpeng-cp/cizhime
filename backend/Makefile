@@ -23,19 +23,19 @@ RESET  := \033[0m
 
 .PHONY: help
 help: ## 显示帮助信息
-	@echo "$(CYAN)API 服务脚手架 - Makefile 命令$(RESET)"
-	@echo ""
+	@echo -e "$(CYAN)API 服务脚手架 - Makefile 命令$(RESET)"
+	@echo -e ""
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(RESET) %s\n", $$1, $$2}'
 
 .PHONY: install
 install: ## 安装依赖工具
-	@echo "$(CYAN)Checking goctl...$(RESET)"
+	@echo -e "$(CYAN)Checking goctl...$(RESET)"
 	@if ! command -v goctl > /dev/null 2>&1; then \
 		echo "$(YELLOW)goctl not found, installing...$(RESET)"; \
 		$(GO) install github.com/zeromicro/go-zero/tools/goctl@latest; \
 	fi
 	goctl --version
-	@echo "$(GREEN)✓ Dependencies installed$(RESET)"
+	@echo -e "$(GREEN)✓ Dependencies installed$(RESET)"
 
 # ==============================================================================
 # 代码生成
@@ -46,13 +46,13 @@ gen: gen-api gen-model gen-swagger ## 生成所有代码
 
 .PHONY: gen-api
 gen-api: ## 生成 API 代码
-	@echo "$(CYAN)生成 API 代码...$(RESET)"
+	@echo -e "$(CYAN)生成 API 代码...$(RESET)"
 	cd service/api && goctl api go -api api.api -dir . --style=goZero
-	@echo "$(GREEN)✓ API 代码生成完成$(RESET)"
+	@echo -e "$(GREEN)✓ API 代码生成完成$(RESET)"
 
 .PHONY: gen-model
 gen-model: ## 生成 Model 代码
-	@echo "$(CYAN)生成 Model 代码...$(RESET)"
+	@echo -e "$(CYAN)生成 Model 代码...$(RESET)"
 	@if [ -d "pkg/model/sql" ] && [ "$$(ls -A pkg/model/sql/*.sql 2>/dev/null)" ]; then \
 		for sql_file in pkg/model/sql/*.sql; do \
 			echo "$(CYAN)Processing $$sql_file...$(RESET)"; \
@@ -73,42 +73,42 @@ gen-model: ## 生成 Model 代码
 
 .PHONY: gen-swagger
 gen-swagger: ## 生成 Swagger 文档
-	@echo "$(CYAN)生成 Swagger 文档...$(RESET)"
+	@echo -e "$(CYAN)生成 Swagger 文档...$(RESET)"
 	@mkdir -p docs/swagger
 	goctl api swagger --api service/api/api.api --dir docs/swagger
-	@echo "$(GREEN)✓ Swagger 文档生成完成: docs/swagger/api.json$(RESET)"
+	@echo -e "$(GREEN)✓ Swagger 文档生成完成: docs/swagger/api.json$(RESET)"
 
 .PHONY: tidy
 tidy: ## go mod tidy
-	@echo "$(CYAN)Running go mod tidy...$(RESET)"
+	@echo -e "$(CYAN)Running go mod tidy...$(RESET)"
 	$(GO) mod tidy
-	@echo "$(GREEN)✓ Dependencies updated$(RESET)"
+	@echo -e "$(GREEN)✓ Dependencies updated$(RESET)"
 
 # ==============================================================================
 # 构建
 # ==============================================================================
 .PHONY: build
 build: ## 构建 API 服务（本机平台）
-	@echo "$(CYAN)构建 API 服务...$(RESET)"
+	@echo -e "$(CYAN)构建 API 服务...$(RESET)"
 	@mkdir -p bin
 	$(GO) build -ldflags "-s -w -X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT)" -o bin/api-local ./service/api/
-	@echo "$(GREEN)✓ bin/api-local$(RESET)"
+	@echo -e "$(GREEN)✓ bin/api-local$(RESET)"
 
 LINUX_ARCH ?= amd64
 
 .PHONY: build-linux
 build-linux: ## 构建 Linux 二进制（用于服务器部署，默认 amd64，可 LINUX_ARCH=arm64）
-	@echo "$(CYAN)构建 Linux $(LINUX_ARCH) 二进制...$(RESET)"
+	@echo -e "$(CYAN)构建 Linux $(LINUX_ARCH) 二进制...$(RESET)"
 	@mkdir -p bin
 	CGO_ENABLED=0 GOOS=linux GOARCH=$(LINUX_ARCH) $(GO) build -ldflags "-s -w -X main.Version=$(VERSION) -X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT)" -o bin/api ./service/api/
-	@echo "$(GREEN)✓ bin/api$(RESET)"
+	@echo -e "$(GREEN)✓ bin/api$(RESET)"
 
 # ==============================================================================
 # 运行
 # ==============================================================================
 .PHONY: run
 run: ## 运行 API 服务
-	@echo "$(CYAN)Starting API server...$(RESET)"
+	@echo -e "$(CYAN)Starting API server...$(RESET)"
 	set -a; source .env 2>/dev/null || true; set +a; $(GO) run ./service/api/ -f service/api/etc/api.yaml
 
 # ==============================================================================
@@ -116,9 +116,9 @@ run: ## 运行 API 服务
 # ==============================================================================
 .PHONY: docker
 docker: ## 构建 Docker 镜像
-	@echo "$(CYAN)Building API Docker image...$(RESET)"
+	@echo -e "$(CYAN)Building API Docker image...$(RESET)"
 	$(DOCKER) build -f docker/Dockerfile.api -t api:$(VERSION) .
-	@echo "$(GREEN)✓ Image: api:$(VERSION)$(RESET)"
+	@echo -e "$(GREEN)✓ Image: api:$(VERSION)$(RESET)"
 
 # ==============================================================================
 # 基础设施
@@ -128,21 +128,21 @@ INFRA_ENV := --env-file $(INFRA_DIR)/.env.infra
 
 .PHONY: infra-up
 infra-up: ## 启动核心基础设施（MySQL+Redis）
-	@echo "$(CYAN)Starting core infrastructure...$(RESET)"
+	@echo -e "$(CYAN)Starting core infrastructure...$(RESET)"
 	@if [ ! -f $(INFRA_DIR)/.env.infra ]; then cp $(INFRA_DIR)/.env.infra.example $(INFRA_DIR)/.env.infra; fi
 	$(DOCKER_COMPOSE) -f $(INFRA_DIR)/docker-compose.base.yml $(INFRA_ENV) up -d
-	@echo "$(YELLOW)Waiting for MySQL to be ready...$(RESET)"
+	@echo -e "$(YELLOW)Waiting for MySQL to be ready...$(RESET)"
 	@sleep 10
-	@echo "$(CYAN)Syncing and importing SQL schema...$(RESET)"
+	@echo -e "$(CYAN)Syncing and importing SQL schema...$(RESET)"
 	@chmod +x scripts/sync-sql.sh && ./scripts/sync-sql.sh
-	@echo "$(GREEN)✓ Core infrastructure ready$(RESET)"
-	@echo ""
-	@echo "$(CYAN)========================================$(RESET)"
-	@echo "$(CYAN)  Core Services$(RESET)"
-	@echo "$(CYAN)========================================$(RESET)"
-	@echo "  $(GREEN)MySQL Adminer:$(RESET)     http://localhost:8085"
-	@echo "  $(GREEN)Redis Insight:$(RESET)     http://localhost:5540"
-	@echo "$(CYAN)========================================$(RESET)"
+	@echo -e "$(GREEN)✓ Core infrastructure ready$(RESET)"
+	@echo -e ""
+	@echo -e "$(CYAN)========================================$(RESET)"
+	@echo -e "$(CYAN)  Core Services$(RESET)"
+	@echo -e "$(CYAN)========================================$(RESET)"
+	@echo -e "  $(GREEN)MySQL Adminer:$(RESET)     http://localhost:8085"
+	@echo -e "  $(GREEN)Redis Insight:$(RESET)     http://localhost:5540"
+	@echo -e "$(CYAN)========================================$(RESET)"
 
 .PHONY: infra-down
 infra-down: ## 停止所有基础设施
@@ -150,7 +150,7 @@ infra-down: ## 停止所有基础设施
 
 .PHONY: db-import
 db-import: ## 导入 SQL
-	@echo "$(CYAN)Syncing and importing SQL schema...$(RESET)"
+	@echo -e "$(CYAN)Syncing and importing SQL schema...$(RESET)"
 	@chmod +x scripts/sync-sql.sh && ./scripts/sync-sql.sh
 
 # ==============================================================================
@@ -158,9 +158,9 @@ db-import: ## 导入 SQL
 # ==============================================================================
 .PHONY: test
 test: ## 运行测试
-	@echo "$(CYAN)Running tests...$(RESET)"
+	@echo -e "$(CYAN)Running tests...$(RESET)"
 	$(GO) test -v -race ./...
-	@echo "$(GREEN)✓ Tests completed$(RESET)"
+	@echo -e "$(GREEN)✓ Tests completed$(RESET)"
 
 .PHONY: lint
 lint: ## 代码检查
@@ -168,17 +168,17 @@ lint: ## 代码检查
 		echo "$(CYAN)Installing golangci-lint...$(RESET)"; \
 		$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
 	}
-	@echo "$(CYAN)Running linter...$(RESET)"
+	@echo -e "$(CYAN)Running linter...$(RESET)"
 	golangci-lint run ./...
-	@echo "$(GREEN)✓ Linting completed$(RESET)"
+	@echo -e "$(GREEN)✓ Linting completed$(RESET)"
 
 # ==============================================================================
 # 清理
 # ==============================================================================
 .PHONY: clean
 clean: ## 清理构建产物
-	@echo "$(CYAN)Cleaning...$(RESET)"
+	@echo -e "$(CYAN)Cleaning...$(RESET)"
 	rm -rf bin/
 	find . -name "*.test" -delete
 	find . -name "coverage.out" -delete
-	@echo "$(GREEN)✓ Cleaned$(RESET)"
+	@echo -e "$(GREEN)✓ Cleaned$(RESET)"

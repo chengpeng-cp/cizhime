@@ -82,8 +82,9 @@ request.interceptors.response.use(
     const res = response.data
     if (res && typeof res === 'object' && 'code' in res) {
       if (res.code !== 0) {
-        const error: any = new Error(res.message || '请求失败')
-        error.response = { status: res.code, data: res }
+        const error = Object.assign(new Error(res.message || '请求失败'), {
+          response: { status: res.code, data: res },
+        })
         return Promise.reject(error)
       }
       return res.data ?? res
@@ -97,7 +98,7 @@ request.interceptors.response.use(
       const { status, data } = error.response
       const message = data?.message || data?.error || '请求失败'
       switch (status) {
-        case 401:
+        case 401: {
           if (originalRequest._retry || originalRequest.url?.includes('/refresh-token')) {
             authStorage.clearAll()
             notifyAuthExpired()
@@ -128,6 +129,7 @@ request.interceptors.response.use(
           authStorage.clearAll()
           notifyAuthExpired()
           break
+        }
         case 403:
           showToast(`权限不足: ${message}`, 'warning')
           console.error('没有权限访问:', message)

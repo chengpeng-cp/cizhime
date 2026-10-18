@@ -40,11 +40,14 @@ func (l *GetReportLogic) GetReport(req *types.GetReportRequest) (resp *types.Rep
 		return nil, errno.ErrInternal
 	}
 
-	// 构建响应
+	// 构建响应（切片初始化为空数组，避免 JSON 序列化为 null）
 	resp = &types.ReportResponse{
-		ShareCode: report.ShareCode,
-		Verdict:   report.Verdict,
-		Score:     int(report.Score),
+		ShareCode:  report.ShareCode,
+		Verdict:    report.Verdict,
+		Score:      int(report.Score),
+		Highlights: []string{},
+		Warnings:   []string{},
+		Advice:     []string{},
 	}
 
 	if report.Summary.Valid {

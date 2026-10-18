@@ -102,14 +102,24 @@ func buildMessages(style AgentStyle, questionnaire map[string]interface{}) ([]*s
 
 // extractJSON 从 AI 返回的文本中提取 JSON
 func extractJSON(text string) string {
-	// 去除可能的 markdown 代码块标记
 	text = strings.TrimSpace(text)
-	if strings.HasPrefix(text, "```json") {
-		text = strings.TrimPrefix(text, "```json")
-		text = strings.TrimSuffix(text, "```")
-	} else if strings.HasPrefix(text, "```") {
-		text = strings.TrimPrefix(text, "```")
-		text = strings.TrimSuffix(text, "```")
+
+	// 去除可能的 markdown 代码块标记（```json ... ``` 或 ``` ... ```）
+	if idx := strings.Index(text, "```"); idx != -1 {
+		text = text[idx+3:]
+		text = strings.TrimPrefix(text, "json")
+		if end := strings.LastIndex(text, "```"); end != -1 {
+			text = text[:end]
+		}
+		text = strings.TrimSpace(text)
 	}
+
+	// 只提取最外层的 JSON 对象，忽略前后可能存在的说明文字
+	start := strings.Index(text, "{")
+	end := strings.LastIndex(text, "}")
+	if start != -1 && end > start {
+		text = text[start : end+1]
+	}
+
 	return strings.TrimSpace(text)
 }

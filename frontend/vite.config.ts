@@ -17,8 +17,9 @@ export default defineConfig({
         // todo: 修改代理目标地址为你的后端服务地址
         target: 'http://localhost:8888',
         changeOrigin: true,
-        timeout: 15000,
-        proxyTimeout: 15000,
+        // AI 生成接口耗时较长，代理超时需大于后端处理时间（api.yaml Timeout）
+        timeout: 180000,
+        proxyTimeout: 180000,
       },
     },
   },

@@ -4,7 +4,7 @@ Name: api-test
 Host: 0.0.0.0
 Port: 8889
 
-Timeout: 30000
+Timeout: 120000
 MaxBytes: 10485760
 
 Auth:

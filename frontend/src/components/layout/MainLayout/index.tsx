@@ -21,7 +21,7 @@ export default function MainLayout() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-lg font-semibold text-amber-400 hover:opacity-80"
+              className="flex items-center gap-2 text-lg font-semibold text-amber-600 dark:text-amber-400 hover:opacity-80"
             >
               <Home size={20} />
               <span>辞职么</span>

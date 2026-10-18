@@ -14,7 +14,6 @@ export default function HomePage() {
         .fromTo('.hero-title', { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
         .fromTo('.hero-subtitle', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.5')
         .fromTo('.hero-cta', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, '-=0.4')
-        .fromTo('.hero-footer', { opacity: 0 }, { opacity: 1, duration: 0.8 }, '-=0.2')
     }, root)
     return () => ctx.revert()
   }, [])
@@ -26,18 +25,18 @@ export default function HomePage() {
     >
       {/* 背景渐变光晕 */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(251,191,36,0.18),_transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-slate-900/0 via-slate-900/0 to-slate-950/40" />
+      <div className="pointer-events-none absolute inset-0 -z-10 dark:bg-gradient-to-b dark:from-slate-900/0 dark:via-slate-900/0 dark:to-slate-950/40" />
 
-      <div className="hero-badge mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-sm text-amber-300">
+      <div className="hero-badge mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-sm text-amber-600 dark:text-amber-300">
         <Sparkles size={16} />
         <span>AI 辅助辞职决策工具</span>
       </div>
 
-      <h1 className="hero-title text-center text-7xl font-black tracking-tight text-amber-400 sm:text-8xl">
+      <h1 className="hero-title text-center text-7xl font-black tracking-tight text-amber-500 dark:text-amber-400 sm:text-8xl">
         辞职么
       </h1>
 
-      <p className="hero-subtitle mt-6 text-center text-lg text-slate-300 sm:text-2xl">
+      <p className="hero-subtitle mt-6 text-center text-lg text-slate-600 dark:text-slate-300 sm:text-2xl">
         AI 帮你分析该不该辞职
       </p>
 

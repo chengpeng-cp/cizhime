@@ -57,9 +57,9 @@ export default function GeneratingPage() {
     >
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_rgba(251,191,36,0.15),_transparent_60%)]" />
 
-      <Loader2 className="gen-spinner mb-8 animate-spin text-amber-400" size={64} />
+      <Loader2 className="gen-spinner mb-8 animate-spin text-amber-500 dark:text-amber-400" size={64} />
 
-      <p className="gen-text text-xl text-slate-200">{MESSAGES[messageIndex]}</p>
+      <p className="gen-text text-xl text-slate-700 dark:text-slate-200">{MESSAGES[messageIndex]}</p>
 
       <p className="mt-4 text-sm text-slate-500">AI 正在深度思考，请稍候</p>
     </div>
