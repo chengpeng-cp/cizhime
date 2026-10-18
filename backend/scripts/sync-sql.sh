@@ -25,8 +25,14 @@ fi
 
 MYSQL_CONTAINER="${MYSQL_CONTAINER:-cileme-mysql}"
 MYSQL_USER="root"
-MYSQL_PASSWORD="${MYSQL_ROOT_PASSWORD:-REDACTED}"
+MYSQL_PASSWORD="${MYSQL_ROOT_PASSWORD}"
 MYSQL_DATABASE="${MYSQL_DATABASE:-cileme}"
+
+if [ -z "$MYSQL_PASSWORD" ]; then
+    echo -e "${RED}Error: MYSQL_ROOT_PASSWORD is not set${RESET}"
+    echo -e "${YELLOW}Please set it in deploy/.env.infra (see deploy/.env.infra.example)${RESET}"
+    exit 1
+fi
 
 echo -e "${CYAN}=== SQL Sync & Import ===${RESET}"
 echo ""

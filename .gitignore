@@ -29,10 +29,12 @@ desktop.ini
 skills/
 # Trae / AI 会话与缓存
 .trae-*
+# git-filter-repo 历史备份（含旧历史，严禁推送）
+.rewrite-backup-*/
 
 # -------------------- 内部文档（按需保留 README） --------------------
 # docs 目录为内部协作文档（PRD/SOP/代码规则等），不对外公开
-docs/
+personal-docs/
 # 后端 swagger 为生成产物，按需保留；如需提交可注释下一行
 backend/docs/swagger/
 
@@ -98,6 +100,7 @@ bin/
 vendor/
 # 编译缓存
 *.cover
+go.work
 go.work.sum
 
 # -------------------- 容器 / 部署临时 --------------------
