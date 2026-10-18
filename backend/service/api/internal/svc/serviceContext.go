@@ -21,8 +21,9 @@ type ServiceContext struct {
 	Conn   sqlx.SqlConn
 	Redis  *redis.Redis
 
-	JwtAuth    func(next http.HandlerFunc) http.HandlerFunc
-	ApiLimiter func(next http.HandlerFunc) http.HandlerFunc
+	JwtAuth        func(next http.HandlerFunc) http.HandlerFunc
+	ApiLimiter     func(next http.HandlerFunc) http.HandlerFunc
+	AnalyzeLimiter func(next http.HandlerFunc) http.HandlerFunc
 
 	ChatModel   model.ChatModel
 	ReportsModel reports.ReportsModel
@@ -77,8 +78,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Conn:   conn,
 		Redis:  rds,
 
-		JwtAuth:    middleware.NewJwtAuthMiddleware(c.Auth.AccessSecret).Handle,
-		ApiLimiter: middleware.RateLimitMiddleware(middleware.NewRateLimiter(100, time.Minute)),
+		JwtAuth: middleware.NewJwtAuthMiddleware(c.Auth.AccessSecret).Handle,
+		// 通用限流：120 次/分钟/IP，防止接口被恶意刷取
+		ApiLimiter: middleware.RateLimitMiddleware(middleware.NewRateLimiter(120, time.Minute)),
+		// AI 生成接口更严格：10 次/分钟/IP，直接关系模型 token 成本
+		AnalyzeLimiter: middleware.RateLimitMiddleware(middleware.NewRateLimiter(10, time.Minute)),
 
 		ChatModel:   chatModel,
 		ReportsModel: reportsModel,

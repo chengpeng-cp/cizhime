@@ -7,15 +7,18 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"math/rand"
+	"errors"
+	"strings"
 
 	"cizhima-backend/pkg/ai"
 	"cizhima-backend/pkg/env"
 	"cizhima-backend/pkg/errno"
 	"cizhima-backend/pkg/model/reports"
+	"cizhima-backend/pkg/sharecode"
 	"cizhima-backend/service/api/internal/svc"
 	"cizhima-backend/service/api/internal/types"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -33,14 +36,13 @@ func NewAnalyzeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AnalyzeLo
 	}
 }
 
-// generateShareCode 生成 6 位随机分享码（Base62）
-func generateShareCode() string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	b := make([]byte, 6)
-	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
+// isDuplicateKeyErr 判断是否为 MySQL 唯一键冲突错误（错误码 1062）
+func isDuplicateKeyErr(err error) bool {
+	var mysqlErr *mysql.MySQLError
+	if errors.As(err, &mysqlErr) {
+		return mysqlErr.Number == 1062
 	}
-	return string(b)
+	return strings.Contains(err.Error(), "Duplicate entry")
 }
 
 func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportResponse, err error) {
@@ -75,6 +77,13 @@ func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportRes
 	report, err := ai.Analyze(l.ctx, l.svcCtx.ChatModel, ai.AgentStyle(req.AgentStyle), questionnaire)
 	if err != nil {
 		l.Errorf("AI analyze failed: %v", err)
+		// 区分超时/繁忙，前端可给出更准确的提示
+		if errors.Is(err, ai.ErrAITimeout) {
+			return nil, errno.ErrAITimeout
+		}
+		if errors.Is(err, ai.ErrAIBusy) {
+			return nil, errno.ErrAIBusy
+		}
 		if env.IsProd() {
 			return nil, errno.ErrAIAnalyzeFailed
 		}
@@ -99,10 +108,7 @@ func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportRes
 		report.Advice = []string{}
 	}
 
-	// 5. 生成分享码
-	shareCode := generateShareCode()
-
-	// 6. 准备数据库存储数据
+	// 5. 生成分享码并入库（唯一键冲突时自动重新生成，避免极小概率碰撞直接失败）
 	qBytes, _ := json.Marshal(questionnaire)
 	highlights, _ := json.Marshal(report.Highlights)
 	warnings, _ := json.Marshal(report.Warnings)
@@ -110,23 +116,39 @@ func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportRes
 	advice, _ := json.Marshal(report.Advice)
 	rawResponse, _ := json.Marshal(report)
 
-	// 7. 存入数据库
-	_, err = l.svcCtx.ReportsModel.Insert(l.ctx, &reports.Reports{
-		ShareCode:     shareCode,
-		AgentStyle:    req.AgentStyle,
-		Questionnaire: string(qBytes),
-		Verdict:       report.Verdict,
-		Score:         int64(report.Score),
-		Summary:       sql.NullString{String: report.Summary, Valid: report.Summary != ""},
-		Highlights:    sql.NullString{String: string(highlights), Valid: len(report.Highlights) > 0},
-		Warnings:      sql.NullString{String: string(warnings), Valid: len(report.Warnings) > 0},
-		Analysis:      sql.NullString{String: string(analysis), Valid: len(report.Analysis) > 0},
-		Advice:        sql.NullString{String: string(advice), Valid: len(report.Advice) > 0},
-		Roast:         sql.NullString{String: report.Roast, Valid: report.Roast != ""},
-		RawResponse:   sql.NullString{String: string(rawResponse), Valid: true},
-	})
-	if err != nil {
-		l.Errorf("Failed to insert report: %v", err)
+	const maxShareCodeAttempts = 5
+	var shareCode string
+	var insertErr error
+	for attempt := 1; attempt <= maxShareCodeAttempts; attempt++ {
+		shareCode = sharecode.Generate(6)
+		_, insertErr = l.svcCtx.ReportsModel.Insert(l.ctx, &reports.Reports{
+			ShareCode:     shareCode,
+			AgentStyle:    req.AgentStyle,
+			Questionnaire: string(qBytes),
+			Verdict:       report.Verdict,
+			Score:         int64(report.Score),
+			Summary:       sql.NullString{String: report.Summary, Valid: report.Summary != ""},
+			Highlights:    sql.NullString{String: string(highlights), Valid: len(report.Highlights) > 0},
+			Warnings:      sql.NullString{String: string(warnings), Valid: len(report.Warnings) > 0},
+			Analysis:      sql.NullString{String: string(analysis), Valid: len(report.Analysis) > 0},
+			Advice:        sql.NullString{String: string(advice), Valid: len(report.Advice) > 0},
+			Roast:         sql.NullString{String: report.Roast, Valid: report.Roast != ""},
+			RawResponse:   sql.NullString{String: string(rawResponse), Valid: true},
+		})
+		if insertErr == nil {
+			break
+		}
+		if isDuplicateKeyErr(insertErr) {
+			l.Infof("分享码冲突，重新生成: %s（第 %d 次）", shareCode, attempt)
+			continue
+		}
+		break
+	}
+	if insertErr != nil {
+		l.Errorf("Failed to insert report: %v", insertErr)
+		if isDuplicateKeyErr(insertErr) {
+			return nil, errno.ErrShareCodeExists
+		}
 		return nil, errno.ErrInternal.WithMessage("保存报告失败")
 	}
 

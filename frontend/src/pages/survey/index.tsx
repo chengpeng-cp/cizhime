@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
-import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react'
-import { analyzeReport } from '@/services/report'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { AGENT_STYLES, type Questionnaire } from '@/types/report'
 
 interface SingleOption {
@@ -161,14 +160,18 @@ const INITIAL_ANSWERS: Questionnaire = {
 
 export default function SurveyPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const root = useRef<HTMLDivElement>(null)
-  const [step, setStep] = useState(0)
+
+  // 从生成失败页返回时恢复已填写的答案，直接回到风格选择步骤
+  const restore = location.state as { answers?: Questionnaire; agentStyle?: string } | null
+  const [step, setStep] = useState(() => (restore?.answers ? TOTAL + 1 : 0))
   const [direction, setDirection] = useState(1)
-  const [agentStyle, setAgentStyle] = useState('poison')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [answers, setAnswers] = useState<Questionnaire>(INITIAL_ANSWERS)
-  const [extraNote, setExtraNote] = useState('')
+  const [agentStyle, setAgentStyle] = useState(restore?.agentStyle ?? 'poison')
+  const [answers, setAnswers] = useState<Questionnaire>(() =>
+    restore?.answers ? { ...INITIAL_ANSWERS, ...restore.answers } : INITIAL_ANSWERS
+  )
+  const [extraNote, setExtraNote] = useState(restore?.answers?.extraNote ?? '')
 
   const isExtraStep = step === TOTAL
   const isAgentStep = step === TOTAL + 1
@@ -211,17 +214,11 @@ export default function SurveyPage() {
     setAnswers((prev) => ({ ...prev, [key]: value }))
   }
 
-  const handleSubmit = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      const res = await analyzeReport({ agentStyle, questionnaire: { ...answers, extraNote } })
-      navigate('/generating', { state: { shareCode: res.shareCode } })
-    } catch {
-      setError('生成报告失败，请稍后重试')
-    } finally {
-      setLoading(false)
-    }
+  // 提交后立即进入生成页，由生成页发起请求并展示进度/重试
+  const handleSubmit = () => {
+    navigate('/generating', {
+      state: { payload: { agentStyle, questionnaire: { ...answers, extraNote } } },
+    })
   }
 
   const TOTAL_STEPS = TOTAL + 1 // 10题 + 补充说明
@@ -244,7 +241,7 @@ export default function SurveyPage() {
       </div>
 
       {/* 返回按钮 */}
-      {step > 0 && !loading && (
+      {step > 0 && (
         <button
           onClick={goBack}
           className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 transition-colors hover:text-amber-500 dark:hover:text-amber-400"
@@ -366,24 +363,11 @@ export default function SurveyPage() {
               })}
             </div>
 
-            {error && (
-              <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300">
-                <AlertCircle size={16} /> {error}
-              </div>
-            )}
-
             <button
               onClick={handleSubmit}
-              disabled={loading}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-amber-300 disabled:opacity-60"
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-amber-300"
             >
-              {loading ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" /> AI 思考中...
-                </>
-              ) : (
-                '生成报告'
-              )}
+              生成报告
             </button>
           </div>
         )}
