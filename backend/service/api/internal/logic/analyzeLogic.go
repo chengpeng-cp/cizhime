@@ -52,7 +52,7 @@ func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportRes
 	}
 
 	// 2. 检查 ChatModel 是否可用
-	if l.svcCtx.ChatModel == nil {
+	if len(l.svcCtx.ChatModels) == 0 {
 		return nil, errno.ErrAIAnalyzeFailed.WithMessage("AI 服务未初始化")
 	}
 
@@ -74,7 +74,7 @@ func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportRes
 	}
 
 	// 4. 调用 AI 分析
-	report, err := ai.Analyze(l.ctx, l.svcCtx.ChatModel, ai.AgentStyle(req.AgentStyle), questionnaire)
+	report, err := ai.AnalyzeWithModels(l.ctx, l.svcCtx.ChatModels, ai.AgentStyle(req.AgentStyle), questionnaire)
 	if err != nil {
 		l.Errorf("AI analyze failed: %v", err)
 		// 区分超时/繁忙，前端可给出更准确的提示

@@ -10,7 +10,6 @@ import (
 	"cizhima-backend/service/api/internal/config"
 	"cizhima-backend/service/api/internal/middleware"
 
-	"github.com/cloudwego/eino/components/model"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -25,7 +24,7 @@ type ServiceContext struct {
 	ApiLimiter     func(next http.HandlerFunc) http.HandlerFunc
 	AnalyzeLimiter func(next http.HandlerFunc) http.HandlerFunc
 
-	ChatModel   model.ChatModel
+	ChatModels   []ai.ChatModelCandidate
 	ReportsModel reports.ReportsModel
 }
 
@@ -63,11 +62,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	// 创建 AI ChatModel
-	chatModel, err := ai.NewChatModel(context.Background(), &c.AI)
+	chatModels, err := ai.NewChatModels(context.Background(), &c.AI)
 	if err != nil {
-		// AI 服务不可用不应阻止服务启动，logic 层会处理 nil ChatModel
+		// AI 服务不可用不应阻止服务启动，logic 层会处理空 ChatModels
 		logx.Errorf("AI ChatModel 初始化失败，analyze 接口将不可用: %v", err)
-		chatModel = nil
+		chatModels = nil
 	}
 
 	// 创建 reports model
@@ -84,7 +83,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		// AI 生成接口更严格：10 次/分钟/IP，直接关系模型 token 成本
 		AnalyzeLimiter: middleware.RateLimitMiddleware(middleware.NewRateLimiter(10, time.Minute)),
 
-		ChatModel:   chatModel,
+		ChatModels:   chatModels,
 		ReportsModel: reportsModel,
 	}
 }

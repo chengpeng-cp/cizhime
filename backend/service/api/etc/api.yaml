@@ -48,7 +48,8 @@ Prometheus:
   Path: /metrics
 
 AI:
-  Provider: "${AI_PROVIDER}"    # deepseek/dashscope/moonshot/openai/custom
+  Provider: "${AI_PROVIDER}"    # deepseek/dashscope/moonshot/openai/openrouter/custom
   APIKey: "${AI_API_KEY}"
   BaseURL: "${AI_BASE_URL}"     # 可选，custom 时必填；其他 provider 不填使用预设
   Model: "${AI_MODEL}"          # 可选，不填使用预设默认模型
+  FallbackModels: "${AI_FALLBACK_MODELS}" # 可选，逗号分隔；OpenRouter 默认启用免费模型容灾

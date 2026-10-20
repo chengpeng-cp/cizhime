@@ -8,8 +8,6 @@ services:
   mysql:
     image: mysql:8.0
     container_name: cizhima-mysql
-    ports:
-      - "${MYSQL_PORT:-3306}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-cizhima}
@@ -30,8 +28,6 @@ services:
   redis:
     image: redis:7-alpine
     container_name: cizhima-redis
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
@@ -59,10 +55,11 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      AI_PROVIDER: ${AI_PROVIDER:-deepseek}
+      AI_PROVIDER: ${AI_PROVIDER:-openrouter}
       AI_API_KEY: ${AI_API_KEY}
       AI_BASE_URL: ${AI_BASE_URL:-}
       AI_MODEL: ${AI_MODEL:-}
+      AI_FALLBACK_MODELS: ${AI_FALLBACK_MODELS:-}
     depends_on:
       mysql:
         condition: service_healthy

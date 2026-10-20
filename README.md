@@ -53,7 +53,7 @@
 - **分享长图导出**：一键把报告保存为高清长图，自带品牌落款，方便发朋友圈 / 群聊
 - **本地历史记录**：自动在浏览器本地保存最近生成的报告，随时可以回访
 - **多 Agent 风格**：毒舌损友 / 专业顾问 / 阴阳大师 / 知心大姐，四种 AI 表达风格
-- **多 AI Provider**：支持 DeepSeek、通义 DashScope、Moonshot、OpenAI 及自定义接入
+- **多 AI Provider**：支持 DeepSeek、通义 DashScope、Moonshot、OpenAI、OpenRouter 及自定义接入；OpenRouter 可配置多个模型自动容灾
 - **响应式 UI**：基于 Tailwind CSS 的现代界面，支持亮/暗主题与动画交互
 - **工程化脚手架**：goctl 代码生成、统一响应、错误码体系、接口限流、AI 自动重试、单元测试与 GitHub Actions CI、Docker 编排一应俱全
 
@@ -67,7 +67,7 @@
 | Go 1.26 | 开发语言 |
 | MySQL 8 | 报告数据存储 |
 | Redis 7 | 缓存 |
-| JWT | 认证中间件（含 Token 自动刷新能力） |
+| JWT | 预留认证中间件；当前匿名问卷与报告接口未启用登录认证 |
 | sliding-window | 滑动窗口限流中间件 |
 | [Eino](https://github.com/cloudwego/eino) | 大模型编排（可插拔 Provider） |
 | Docker Compose | 本地基础设施 / 生产编排 |
@@ -81,7 +81,7 @@
 | Redux Toolkit + React Query | 状态管理与数据请求 |
 | Tailwind CSS 4 | 原子化样式 |
 | React Router DOM 7 | 路由（含路由保护） |
-| Axios | HTTP 请求封装（Token 自动刷新、401 重试） |
+| Axios | HTTP 请求封装；认证刷新代码为预留功能，当前 API 未提供登录/刷新 Token 接口 |
 | GSAP + lucide-react | 动画与图标 |
 
 ## 📁 项目结构
@@ -120,7 +120,7 @@ cizhime/
 | [Go](https://go.dev/dl/) | 1.26+ | 后端服务 |
 | [Node.js](https://nodejs.org/) | 20.19+（推荐 22 LTS） | 前端应用 |
 | [Docker & Docker Compose](https://www.docker.com/) | 最新版 | 一键启动 MySQL + Redis |
-| AI API Key | — | DeepSeek / DashScope / Moonshot / OpenAI 任选其一 |
+| AI API Key | — | OpenRouter / DeepSeek / DashScope / Moonshot / OpenAI 任选其一 |
 
 ### 1. 克隆项目
 
@@ -144,7 +144,7 @@ cp .env.example .env
 # 编辑 .env，将 ${CHANGE_ME_*} 占位符替换为真实值
 #   - DB_* / REDIS_*：与下一步 deploy/.env.infra 中的密码保持一致
 #   - JWT_SECRET：至少 32 位随机字符串
-#   - AI_PROVIDER + AI_API_KEY：填你自己的大模型 Key
+#   - AI_PROVIDER + AI_API_KEY：使用 OpenRouter 免费模型时填你自己创建的 OpenRouter Key
 
 # 2) 配置基础设施环境变量：复制模板并设置 MySQL / Redis 密码
 cp deploy/.env.infra.example deploy/.env.infra
@@ -195,9 +195,10 @@ npm run dev
 | `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | MySQL 连接信息 | `localhost` / `3306` / `root` / `***` / `cizhima` |
 | `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` | Redis 连接信息 | `localhost` / `6379` / `***` |
 | `JWT_SECRET` | JWT 签名密钥（≥32 字符） | 随机字符串 |
-| `AI_PROVIDER` | AI 服务商 | `deepseek` / `dashscope` / `moonshot` / `openai` / `custom` |
+| `AI_PROVIDER` | AI 服务商 | `openrouter` / `deepseek` / `dashscope` / `moonshot` / `openai` / `custom` |
 | `AI_API_KEY` | AI 服务 API Key | `sk-***` |
-| `AI_BASE_URL` / `AI_MODEL` | 可选，自定义接入地址与模型 | `https://api.deepseek.com/v1` |
+| `AI_BASE_URL` / `AI_MODEL` | 可选，自定义接入地址与模型 | OpenRouter 默认 `https://openrouter.ai/api/v1` |
+| `AI_FALLBACK_MODELS` | 可选，逗号分隔的备用模型 | OpenRouter 默认 Gemma 4 26B，失败后依次尝试 Xing4.0、Cohere North Mini Code 免费模型 |
 
 ### 基础设施环境变量（`backend/deploy/.env.infra`）
 
@@ -213,7 +214,9 @@ npm run dev
 |------|------|------|
 | `VITE_API_BASE_URL` | 后端 API 基础地址（留空则走 Vite 代理） | `http://localhost:8888` |
 
-> 🔒 真实配置文件（`.env`、`.env.infra`、`.env.prod`）已在 `.gitignore` 中屏蔽，仓库只提交 `.example` 模板，请放心填写真实密钥。
+> 🔒 真实配置文件（`.env`、`.env.infra`、`.env.prod`）已在 `.gitignore` 中屏蔽，仓库只提交 `.example` 模板。免费模型仍需你自己创建 API Key；OpenRouter 免费模型当前有请求数限制，服务可用性不保证。
+
+> ⚠️ OpenRouter 只是统一转发层，问卷内容会发给具体模型提供方。免费端点的数据保留/训练政策因提供方不同；不要提交姓名、公司名等可识别信息。当前默认模型提供方分别报告：Google AI Studio 保留提示 55 天、Phala 零保留、Cohere 不用于训练但保留 30 天。NVIDIA 免费端点明确要求不要提交个人数据，因此没有放入默认容灾列表。
 
 ## 🔌 API 接口
 
@@ -293,13 +296,13 @@ cd frontend && npm install && npm run build
 # 2) 配置生产环境变量
 cd ../backend/deploy
 cp .env.prod.example .env.prod
-# 编辑 .env.prod：数据库/Redis 强密码、JWT_SECRET、AI_API_KEY
+# 编辑 .env.prod：数据库/Redis 强密码、JWT_SECRET，以及你自己创建的 OpenRouter API Key
 
 # 3) 一键启动（MySQL + Redis + API + Nginx）
 docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 ```
 
-访问 `http://<你的服务器IP>` 即可（Nginx 托管前端静态资源并反向代理 `/api` 到后端）。
+访问 `http://<你的服务器IP>` 可做基础连通性检查（Nginx 托管前端静态资源并反向代理 `/api` 到后端）。正式公开服务前需在入口配置 HTTPS；MySQL/Redis 只在 Compose 内网开放，维护时通过 SSH 隧道访问。
 
 ## ❓ 常见问题
 
@@ -312,7 +315,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 <details>
 <summary><b>没有 AI API Key 能跑起来吗？</b></summary>
 
-可以启动项目，但生成报告会失败。建议注册一个 [DeepSeek](https://platform.deepseek.com/) 账号，价格便宜且国内可直连。
+可以启动项目，但生成报告会失败。注册 [OpenRouter](https://openrouter.ai/) 并创建自己的 API Key 后，可使用默认 `google/gemma-4-26b-a4b-it:free` 模型，失败后依次切换到 `xingchen-agi/xing4.0-29b-a4b:free` 和 `cohere/north-mini-code:free`。这些免费模型的 Token 单价为零，但受免费请求配额限制。OpenRouter 当前免费账户上限为 20 次/分钟、50 次/天；模型提供方或服务本身仍可能不可用。Cohere 备用端点当前报告会保留请求 30 天，请勿在问卷中填写姓名、公司名等可识别信息。
 </details>
 
 <details>
