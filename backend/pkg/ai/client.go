@@ -16,7 +16,10 @@ type ChatModelCandidate struct {
 	Model model.ChatModel
 }
 
-const maxFallbackModels = 2
+const (
+	maxFallbackModels     = 2
+	maxReportOutputTokens = 1800
+)
 
 // NewChatModel 创建支持 OpenAI 兼容协议的 ChatModel
 // 支持多种服务商：DeepSeek、通义千问(DashScope)、Moonshot、OpenAI、OpenRouter 等
@@ -64,11 +67,13 @@ func NewChatModels(ctx context.Context, cfg *AIConfig) ([]ChatModelCandidate, er
 	}
 
 	candidates := make([]ChatModelCandidate, 0, len(modelNames))
+	maxTokens := maxReportOutputTokens
 	for i, name := range modelNames {
 		chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
-			BaseURL: cfg.BaseURL,
-			APIKey:  cfg.APIKey,
-			Model:   name,
+			BaseURL:   cfg.BaseURL,
+			APIKey:    cfg.APIKey,
+			Model:     name,
+			MaxTokens: &maxTokens,
 		})
 		if err != nil {
 			if i == 0 {

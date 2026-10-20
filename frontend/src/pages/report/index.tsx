@@ -347,7 +347,7 @@ export default function ReportPage() {
         {report.roast && (
           <section className="report-section report-animate">
             <article className="roast-card">
-              <h2 className="roast-title"><Flame size={15} /> 毒舌补充</h2>
+              <h2 className="roast-title"><Flame size={15} /> 打工人锐评</h2>
               <p className="roast-text">{report.roast}</p>
             </article>
           </section>

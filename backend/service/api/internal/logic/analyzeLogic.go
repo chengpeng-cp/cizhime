@@ -46,6 +46,11 @@ func isDuplicateKeyErr(err error) bool {
 }
 
 func (l *AnalyzeLogic) Analyze(req *types.AnalyzeRequest) (resp *types.ReportResponse, err error) {
+	// 先校验所有用户输入，再访问模型，避免畸形请求消耗推理额度。
+	if err := validateAnalyzeRequest(req); err != nil {
+		return nil, err
+	}
+
 	// 1. 验证 Agent 风格
 	if !ai.IsValidStyle(req.AgentStyle) {
 		return nil, errno.ErrInvalidAgentStyle

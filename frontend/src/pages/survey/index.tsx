@@ -36,8 +36,8 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'education',
     type: 'single',
-    title: '你的最高学历是？',
-    subtitle: '学历不是能力的全部，但会影响你面对的选项。',
+    title: '学历这张牌，你手里是哪一张？',
+    subtitle: '不拿学历给人生定价，只把它当作求职牌桌上的一项信息。',
     options: [
       { label: '高中及以下', value: '高中及以下' },
       { label: '大专', value: '大专' },
@@ -49,8 +49,8 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'region',
     type: 'single',
-    title: '你目前在哪个地区工作？',
-    subtitle: '城市不同，机会、成本和生活节奏也不同。',
+    title: '你在哪个城市打工？',
+    subtitle: '同一份工资，在不同城市的续命难度不太一样。',
     options: [
       { label: '一线城市', value: '一线城市' },
       { label: '新一线城市', value: '新一线城市' },
@@ -62,32 +62,32 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'stability',
     type: 'single',
-    title: '你觉得现在的工作稳定吗？',
-    subtitle: '回想最近一年的变化，选择最接近的状态。',
+    title: '公司给你的安全感，能续到下个月吗？',
+    subtitle: '选最像目前状况的那个，老板画的饼暂不计入固定资产。',
     options: [
-      { label: '非常稳定', value: '铁饭碗' },
-      { label: '比较稳定', value: '较稳定' },
-      { label: '时好时坏', value: '一般般' },
-      { label: '变化很大', value: '随时可能凉' },
+      { label: '铁饭碗，端稳了', value: '铁饭碗' },
+      { label: '相对稳定，偶尔晃一下', value: '较稳定' },
+      { label: '看业绩，也看心情', value: '一般般' },
+      { label: '脆皮饭碗，随时刷新', value: '随时可能凉' },
     ],
   },
   {
     key: 'overtimeFrequency',
     type: 'single',
-    title: '你每周大约加班几次？',
-    subtitle: '按最近一个月的平均情况来选。',
+    title: '这一周，你把几个晚上寄存在公司？',
+    subtitle: '按最近一个月估算；偶尔加班和工位常驻，区别还挺大。',
     options: [
-      { label: '基本不加班', value: '从不加班' },
-      { label: '每周 1–2 次', value: '1-2次' },
-      { label: '每周 3–5 次', value: '3-5次' },
-      { label: '几乎每天都加班', value: '加班是我的第二职业' },
+      { label: '基本不加，准点下班派', value: '从不加班' },
+      { label: '1–2 次，偶尔被召唤', value: '1-2次' },
+      { label: '3–5 次，工位常驻民', value: '3-5次' },
+      { label: '几乎每天，我和公司锁了', value: '加班是我的第二职业' },
     ],
   },
   {
     key: 'commuteMinutes',
     type: 'slider',
-    title: '你每天通勤需要多久？',
-    subtitle: '按往返总时间估算，包含等车和换乘。',
+    title: '每天通勤，灵魂几分钟后才能到工位？',
+    subtitle: '按往返总时间估算，堵车、等车和换乘都算上。',
     min: 0,
     max: 360,
     unit: '分钟',
@@ -97,8 +97,8 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'salaryRange',
     type: 'single',
-    title: '你的月薪大约在什么范围？',
-    subtitle: '选择税前月薪区间，帮助我们理解你的现实成本。',
+    title: '税前月薪大约在哪个区间？',
+    subtitle: '工资到账之后，钱去了哪里我们大概都懂。',
     options: [
       { label: '5k 以下', value: '5k以下' },
       { label: '5k–10k', value: '5-10k' },
@@ -110,8 +110,8 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'salarySatisfaction',
     type: 'slider',
-    title: '你对目前的薪资满意吗？',
-    subtitle: '1 分代表很不满意，10 分代表非常满意。',
+    title: '这份工资，配得上你每天的心情吗？',
+    subtitle: '1 分：发薪日像路过；10 分：终于有被认真对待的感觉。',
     min: 1,
     max: 10,
     minLabel: '很不满意',
@@ -120,32 +120,32 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'workEnvironment',
     type: 'single',
-    title: '你对办公环境感觉如何？',
-    subtitle: '包括工作空间、设备和日常工作氛围。',
+    title: '工位这个“第二个家”，住得还舒服吗？',
+    subtitle: '光线、设备、空间和氛围，都算在工作环境里。',
     options: [
-      { label: '舒适自在', value: '神仙环境' },
-      { label: '整体还不错', value: '还行' },
-      { label: '有些压抑', value: '憋屈' },
-      { label: '很难适应', value: '工地现场' },
+      { label: '光线好，椅子也懂我', value: '神仙环境' },
+      { label: '能用就行，主打一个稳定', value: '还行' },
+      { label: '一坐下就开始想下班', value: '憋屈' },
+      { label: '每天坐班像在渡劫', value: '工地现场' },
     ],
   },
   {
     key: 'colleagueRelation',
     type: 'single',
-    title: '你和同事相处得怎么样？',
-    subtitle: '团队关系往往会影响每天的工作体验。',
+    title: '同事更像队友，还是办公室剧情人物？',
+    subtitle: '选一个最接近的日常，不用替任何人写人物小传。',
     options: [
-      { label: '互相支持', value: '神仙同事' },
-      { label: '普通合作', value: '普通同事' },
-      { label: '有些别扭', value: '塑料同事' },
-      { label: '关系紧张', value: '宫斗现场' },
+      { label: '互相补位的神仙队友', value: '神仙同事' },
+      { label: '各自安好型', value: '普通同事' },
+      { label: '办公室偶像剧型', value: '塑料同事' },
+      { label: '每天都有新剧情', value: '宫斗现场' },
     ],
   },
   {
     key: 'bossToxicity',
     type: 'slider',
-    title: '你和直属领导的合作体验如何？',
-    subtitle: '1 分代表非常顺畅，10 分代表非常困难。',
+    title: '和直属领导合作，费几格血条？',
+    subtitle: '1 分：沟通顺滑；10 分：每次会前都需要深呼吸。',
     min: 1,
     max: 10,
     minLabel: '非常顺畅',
@@ -326,7 +326,7 @@ export default function SurveyPage() {
           <section className="survey-card" aria-labelledby="survey-title">
             <div className="survey-kicker">A LITTLE MORE CONTEXT / 11</div>
             <h1 id="survey-title" className="survey-title">还有什么想补充的吗？</h1>
-            <p className="survey-subtitle">那些没法放进选项里的事，也可以在这里说说。</p>
+            <p className="survey-subtitle">选项装不下的职场剧情，可以在这里展开讲两句。</p>
             <label className="note-label-row" htmlFor="extra-note">
               <span>补充情况</span><span>{extraNote.length} / 500</span>
             </label>
@@ -334,7 +334,7 @@ export default function SurveyPage() {
               id="extra-note"
               value={extraNote}
               onChange={(event) => setExtraNote(event.target.value)}
-              placeholder="比如：正在考虑转行、近期有家庭计划，或者有一件事一直让你很纠结……"
+              placeholder="比如：每天开会到很晚、绩效全靠玄学，或者已经拿到 offer 但还在纠结……"
               rows={5}
               maxLength={500}
               className="survey-textarea"

@@ -29,7 +29,7 @@ type (
 		SalarySatisfaction int    `json:"salarySatisfaction"` // 薪资满意度1-10
 		WorkEnvironment    string `json:"workEnvironment"` // 办公环境
 		ColleagueRelation  string `json:"colleagueRelation"` // 同事关系
-		BossToxicity       int    `json:"bossToxicity"` // 领导二逼程度1-10
+		BossToxicity       int    `json:"bossToxicity"` // 领导合作体验1-10
 		ExtraNote          string `json:"extraNote,optional"` // 用户自由补充内容
 	}
 	AnalyzeRequest {

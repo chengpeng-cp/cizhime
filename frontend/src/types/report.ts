@@ -55,25 +55,25 @@ export const AGENT_STYLES: AgentStyle[] = [
   {
     id: 'poison',
     name: '毒舌损友',
-    description: '语言犀利、一针见血、带点损',
+    description: '嘴上不留情，建议还挺实在',
     emoji: '😏',
   },
   {
     id: 'professional',
     name: '专业顾问',
-    description: '客观理性、条理清晰、数据导向',
+    description: '不带情绪，按账本把问题拆开',
     emoji: '🤓',
   },
   {
     id: 'yinyang',
     name: '阴阳大师',
-    description: '阴阳怪气、反讽拉满、笑里藏刀',
+    description: '先客气两句，再把重点递过来',
     emoji: '🙃',
   },
   {
     id: 'sister',
     name: '知心大姐',
-    description: '温柔共情、循循善诱、鸡汤满满',
+    description: '先接住情绪，再陪你一起想办法',
     emoji: '🥰',
   },
 ]
