@@ -24,6 +24,7 @@ interface QuestionDef {
   type: 'single' | 'slider'
   title: string
   subtitle: string
+  reaction: string
   options?: SingleOption[]
   min?: number
   max?: number
@@ -36,8 +37,9 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'education',
     type: 'single',
-    title: '学历这张牌，你手里是哪一张？',
-    subtitle: '不拿学历给人生定价，只把它当作求职牌桌上的一项信息。',
+    title: '最高学历这张牌，你手里是哪一张？',
+    subtitle: '只做工作状态参考，学历不负责替老板的决策背锅。',
+    reaction: '收到，学历是你的经历，不是工位的使用说明书。',
     options: [
       { label: '高中及以下', value: '高中及以下' },
       { label: '大专', value: '大专' },
@@ -49,8 +51,9 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'region',
     type: 'single',
-    title: '你在哪个城市打工？',
-    subtitle: '同一份工资，在不同城市的续命难度不太一样。',
+    title: '你在哪座城市，和房租展开拉锯？',
+    subtitle: '同一份工资，在不同城市的续命难度确实不一样。',
+    reaction: '记下了，房租和通勤都要算进生活成本。',
     options: [
       { label: '一线城市', value: '一线城市' },
       { label: '新一线城市', value: '新一线城市' },
@@ -64,6 +67,7 @@ const QUESTIONS: QuestionDef[] = [
     type: 'single',
     title: '公司给你的安全感，能续到下个月吗？',
     subtitle: '选最像目前状况的那个，老板画的饼暂不计入固定资产。',
+    reaction: '收到，饼先不估值，咱们看实际资产。',
     options: [
       { label: '铁饭碗，端稳了', value: '铁饭碗' },
       { label: '相对稳定，偶尔晃一下', value: '较稳定' },
@@ -74,8 +78,9 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'overtimeFrequency',
     type: 'single',
-    title: '这一周，你把几个晚上寄存在公司？',
-    subtitle: '按最近一个月估算；偶尔加班和工位常驻，区别还挺大。',
+    title: '最近一个月，你把几个晚上寄存在公司？',
+    subtitle: '偶尔加班和工位常驻，区别还挺大。',
+    reaction: '已计入工时账本，今晚记得把自己领回家。',
     options: [
       { label: '基本不加，准点下班派', value: '从不加班' },
       { label: '1–2 次，偶尔被召唤', value: '1-2次' },
@@ -88,6 +93,7 @@ const QUESTIONS: QuestionDef[] = [
     type: 'slider',
     title: '每天通勤，灵魂几分钟后才能到工位？',
     subtitle: '按往返总时间估算，堵车、等车和换乘都算上。',
+    reaction: '收到，这段路也算你每天交的隐形班。',
     min: 0,
     max: 360,
     unit: '分钟',
@@ -97,8 +103,9 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'salaryRange',
     type: 'single',
-    title: '税前月薪大约在哪个区间？',
-    subtitle: '工资到账之后，钱去了哪里我们大概都懂。',
+    title: '工资条每月给你多少参与感？',
+    subtitle: '按税前月薪估算；我们看回报，不给人贴价签。',
+    reaction: '记下了，数字是一回事，值不值得是另一回事。',
     options: [
       { label: '5k 以下', value: '5k以下' },
       { label: '5k–10k', value: '5-10k' },
@@ -110,8 +117,9 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'salarySatisfaction',
     type: 'slider',
-    title: '这份工资，配得上你每天的心情吗？',
-    subtitle: '1 分：发薪日像路过；10 分：终于有被认真对待的感觉。',
+    title: '发薪日那一刻，你觉得这份工资配得上自己吗？',
+    subtitle: '1 分：到账像路过；10 分：觉得自己的付出被认真对待。',
+    reaction: '收到，满意度比工资数字更能说明感受。',
     min: 1,
     max: 10,
     minLabel: '很不满意',
@@ -122,6 +130,7 @@ const QUESTIONS: QuestionDef[] = [
     type: 'single',
     title: '工位这个“第二个家”，住得还舒服吗？',
     subtitle: '光线、设备、空间和氛围，都算在工作环境里。',
+    reaction: '环境也记下了，椅子不该成为你最亲密的同事。',
     options: [
       { label: '光线好，椅子也懂我', value: '神仙环境' },
       { label: '能用就行，主打一个稳定', value: '还行' },
@@ -132,8 +141,9 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'colleagueRelation',
     type: 'single',
-    title: '同事更像队友，还是办公室剧情人物？',
+    title: '同事是并肩队友，还是办公室连续剧？',
     subtitle: '选一个最接近的日常，不用替任何人写人物小传。',
+    reaction: '收到，办公室剧情暂时不需要续订第二季。',
     options: [
       { label: '互相补位的神仙队友', value: '神仙同事' },
       { label: '各自安好型', value: '普通同事' },
@@ -144,8 +154,9 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'bossToxicity',
     type: 'slider',
-    title: '和直属领导合作，费几格血条？',
-    subtitle: '1 分：沟通顺滑；10 分：每次会前都需要深呼吸。',
+    title: '直属领导的一条消息，能掉你几格血？',
+    subtitle: '1 分：沟通顺滑；10 分：看到“在吗”先深呼吸。',
+    reaction: '收到，领导沟通也纳入本次副本难度。',
     min: 1,
     max: 10,
     minLabel: '非常顺畅',
@@ -184,6 +195,7 @@ export default function SurveyPage() {
   const restore = location.state as { answers?: Questionnaire; agentStyle?: string } | null
   const [step, setStep] = useState(() => (restore?.answers ? TOTAL + 1 : 0))
   const [direction, setDirection] = useState(1)
+  const [sliderTouchedStep, setSliderTouchedStep] = useState<number | null>(null)
   const [agentStyle, setAgentStyle] = useState(restore?.agentStyle ?? 'poison')
   const [answers, setAnswers] = useState<Questionnaire>(() =>
     restore?.answers ? { ...INITIAL_ANSWERS, ...restore.answers } : INITIAL_ANSWERS
@@ -227,11 +239,12 @@ export default function SurveyPage() {
   const handleSingleSelect = (key: keyof Questionnaire, value: string) => {
     setAnswers((previous) => ({ ...previous, [key]: value }))
     if (advanceTimer.current !== null) window.clearTimeout(advanceTimer.current)
-    advanceTimer.current = window.setTimeout(goNext, 360)
+    advanceTimer.current = window.setTimeout(goNext, 620)
   }
 
   const handleSliderChange = (key: keyof Questionnaire, value: number) => {
     setAnswers((previous) => ({ ...previous, [key]: value }))
+    setSliderTouchedStep(step)
   }
 
   const handleSubmit = () => {
@@ -241,7 +254,7 @@ export default function SurveyPage() {
   }
 
   const stepText = isAgentStep
-    ? '选择分析风格'
+    ? '选择你的嘴替'
     : isExtraStep
       ? '补充说明'
       : '第 ' + (step + 1) + ' / ' + TOTAL + ' 题'
@@ -249,7 +262,7 @@ export default function SurveyPage() {
   return (
     <div ref={root} className="survey-page">
       <div className="survey-progress-head">
-        <span className="survey-progress-label"><strong>{stepText}</strong> · 让建议更贴近你的情况</span>
+        <span className="survey-progress-label"><strong>{stepText}</strong> · 答完抽一张打工人命运签</span>
         <span className="survey-progress-value">{Math.round(progress)}%</span>
       </div>
       <div className="progress-track" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
@@ -260,13 +273,15 @@ export default function SurveyPage() {
         {step > 0 ? (
           <button className="survey-back" onClick={goBack}><ArrowLeft size={15} /> 上一步</button>
         ) : <span />}
-        <span className="survey-step-count">{String(step + 1).padStart(2, '0')} / {String(totalSteps).padStart(2, '0')}</span>
+        <span className="survey-step-count">
+          {isAgentStep ? '最后一步' : isExtraStep ? '选填 · 可跳过' : `10 题中 · ${String(step + 1).padStart(2, '0')}`}
+        </span>
       </div>
 
       <div className="survey-step">
         {!isAgentStep && !isExtraStep && current && (
           <section className="survey-card" aria-labelledby="survey-title">
-            <div className="survey-kicker">WORK &amp; LIFE / {String(step + 1).padStart(2, '0')}</div>
+            <div className="survey-kicker">打工人副本 · {String(step + 1).padStart(2, '0')}</div>
             <h1 id="survey-title" className="survey-title">{current.title}</h1>
             <p className="survey-subtitle">{current.subtitle}</p>
 
@@ -287,6 +302,10 @@ export default function SurveyPage() {
                 )
               })}
             </div>
+
+            {current.type === 'single' && Boolean(answers[current.key]) && (
+              <p className="survey-reaction" aria-live="polite"><Sparkles size={14} />{current.reaction}</p>
+            )}
 
             {current.type === 'slider' && (
               <div className="slider-question">
@@ -313,6 +332,9 @@ export default function SurveyPage() {
                     <span>{current.minLabel}</span>
                     <span>{current.maxLabel}</span>
                   </div>
+                {sliderTouchedStep === step && (
+                  <p className="survey-reaction" aria-live="polite"><Sparkles size={14} />{current.reaction}</p>
+                )}
                 </div>
                 <button className="primary-button survey-continue" onClick={goNext}>
                   下一题 <ArrowRight size={16} />
@@ -324,22 +346,22 @@ export default function SurveyPage() {
 
         {isExtraStep && (
           <section className="survey-card" aria-labelledby="survey-title">
-            <div className="survey-kicker">A LITTLE MORE CONTEXT / 11</div>
-            <h1 id="survey-title" className="survey-title">还有什么想补充的吗？</h1>
-            <p className="survey-subtitle">选项装不下的职场剧情，可以在这里展开讲两句。</p>
+            <div className="survey-kicker">隐藏剧情 · 11</div>
+            <h1 id="survey-title" className="survey-title">还有哪段职场剧情，问卷没装下？</h1>
+            <p className="survey-subtitle">写越具体，最后那句锐评越精准。也可以直接跳过。</p>
             <label className="note-label-row" htmlFor="extra-note">
-              <span>补充情况</span><span>{extraNote.length} / 500</span>
+              <span>补充剧情（选填）</span><span>{extraNote.length} / 500</span>
             </label>
             <textarea
               id="extra-note"
               value={extraNote}
               onChange={(event) => setExtraNote(event.target.value)}
-              placeholder="比如：每天开会到很晚、绩效全靠玄学，或者已经拿到 offer 但还在纠结……"
+              placeholder="比如：每天开会到很晚、绩效全靠玄学，或者 offer 已经拿到但还没敢告诉老板……"
               rows={5}
               maxLength={500}
               className="survey-textarea"
             />
-            <p className="note-hint">可以留空跳过。补充的信息会和问卷答案一起用于生成分析。</p>
+            <p className="note-hint">可以留空跳过。请别填写姓名、手机号等个人隐私。</p>
             <button className="primary-button survey-continue" onClick={goNext}>
               继续 <ArrowRight size={16} />
             </button>
@@ -348,9 +370,9 @@ export default function SurveyPage() {
 
         {isAgentStep && (
           <section className="survey-card" aria-labelledby="survey-title">
-            <div className="survey-kicker">CHOOSE YOUR PERSPECTIVE / 12</div>
-            <h1 id="survey-title" className="survey-title">你想听谁来分析？</h1>
-            <p className="survey-subtitle">选择一种表达风格，分析内容仍会根据你的回答生成。</p>
+            <div className="survey-kicker">最后一步 · 12</div>
+            <h1 id="survey-title" className="survey-title">最后，挑个你想听的嘴替。</h1>
+            <p className="survey-subtitle">准备好领取你的命运签和专属职场锐评了吗？</p>
 
             <div className="agent-grid">
               {AGENT_STYLES.map((style) => {

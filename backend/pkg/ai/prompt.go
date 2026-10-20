@@ -68,7 +68,7 @@ func buildMessages(style AgentStyle, questionnaire map[string]interface{}) ([]*s
 {
   "verdict": "建议辞职/建议苟住/建议观望",
   "score": 0-100的整数，表示辞职指数，越高越建议辞职,
-  "summary": "一句话总结",
+  "summary": "一句有记忆点的状态总结",
   "highlights": ["工作亮点1", "工作亮点2"],
   "warnings": ["工作槽点1", "工作槽点2"],
   "analysis": {
@@ -78,7 +78,7 @@ func buildMessages(style AgentStyle, questionnaire map[string]interface{}) ([]*s
     "growth": "发展前景分析"
   },
   "advice": ["建议1", "建议2", "建议3"],
-  "roast": "一句犀利总结"
+  "roast": "一句贴合用户经历的职场锐评"
 }
 
 分析要求：
@@ -87,11 +87,13 @@ func buildMessages(style AgentStyle, questionnaire map[string]interface{}) ([]*s
 3. 给出有建设性的建议
 4. 语言风格要符合你的角色设定
 5. highlights 和 warnings 各 2-3 条
-输出长度要求：summary 不超过 50 个汉字；每条 highlight 和 warning 不超过 40 个汉字；每个 analysis 维度不超过 90 个汉字；每条 advice 不超过 60 个汉字。
-roast 不超过 40 个汉字，要有具体画面和打工人共鸣，读起来像一句能被截图转发的锐评，不能只写泛泛的“打工不易”。
+输出长度要求：summary 不超过 42 个汉字；每条 highlight 和 warning 不超过 40 个汉字；每个 analysis 维度不超过 90 个汉字；每条 advice 不超过 60 个汉字。
+summary 要像朋友看完问卷后脱口而出的一句判断，有具体记忆点，避免“综合来看”“总体而言”等报告腔。
+roast 不超过 36 个汉字。优先抓问卷里最突出的一个细节（如通勤、加班、老板或工资），写成一句有画面、能让同事会心一笑的职场锐评；不要编造用户没提供的经历，也不要只写泛泛的“打工不易”。
 毒舌和阴阳风格可以更俏皮；专业和知心风格保持各自语气，但也要简洁、有记忆点。
 6. advice 给出 3 条具体建议
-7. roast 要有趣、有共鸣、适合传播`, string(qBytes))
+7. summary 和 roast 要具体、好记，适合被单独截图分享
+8. 笑点瞄准职场处境和荒唐流程，不拿用户本人、学历、收入或健康状况开刀`, string(qBytes))
 
 	return []*schema.Message{
 		{

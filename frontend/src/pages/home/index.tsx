@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
 import dayjs from 'dayjs'
-import { ArrowRight, ArrowUpRight, Clock3, Compass, Trash2 } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Compass, Sparkles, Trash2 } from 'lucide-react'
 import { VERDICT_TYPES } from '@/types/report'
 import { clearHistory, getHistory, type ReportHistoryItem } from '@/utils/reportHistory'
 
@@ -38,16 +38,16 @@ export default function HomePage() {
     <div ref={root} className="home-page">
       <section className="hero-layout">
         <div className="hero-copy">
-          <div className="eyebrow home-fade"><span className="eyebrow-mark" /> 职业选择 · 清醒一点</div>
-          <h1 className="hero-title home-fade">辞职这件事，<br />先别急着<em>做决定。</em></h1>
+          <div className="eyebrow home-fade"><span className="eyebrow-mark" /> 打工人状态测试 · 仅供会心一笑</div>
+          <h1 className="hero-title home-fade">你想辞职，<br />还是只想<em>下班？</em></h1>
           <p className="hero-description home-fade">
-            把工作里的好与坏都摆上桌面。用一份轻松的测评，帮你理清处境、看见选择，再决定下一步。
+            10 题抽一张你的「打工人命运签」：工位稳定器、离职观察员，还是逃离工位预备役？答完还有一条量身定制的职场锐评。
           </p>
           <div className="hero-actions home-fade">
             <button className="primary-button" onClick={() => navigate('/survey')}>
-              开始职业测评 <ArrowRight size={17} />
+              抽一张命运签 <ArrowRight size={17} />
             </button>
-            <span className="hero-meta"><Clock3 size={14} style={{ verticalAlign: '-2px', marginRight: 5 }} />约 3 分钟 · 10 个问题</span>
+            <span className="hero-meta"><Sparkles size={14} style={{ verticalAlign: '-2px', marginRight: 5 }} />10 题 · 答完可分享</span>
           </div>
         </div>
 
@@ -56,14 +56,14 @@ export default function HomePage() {
             <span><i className="visual-dot" />职业状态快照</span>
             <span>CAREER CHECK / 01</span>
           </div>
-          <p className="visual-title">工作不该只剩下<br /><span>“要不要辞职”</span><br />这一道选择题。</p>
+          <p className="visual-title">先别急着提离职，<br />看看你在职场副本里<br /><span>还剩几格血条。</span></p>
           <div className="visual-orbit" aria-hidden="true">
             <div className="visual-orbit-ring">3<small>MINUTES</small></div>
           </div>
           <div className="visual-facts">
-            <div className="visual-fact"><strong>10</strong><span>个真实问题</span></div>
-            <div className="visual-fact"><strong>4</strong><span>种分析视角</span></div>
-            <div className="visual-fact"><strong>1</strong><span>份专属建议</span></div>
+            <div className="visual-fact"><strong>10</strong><span>题快速测一测</span></div>
+            <div className="visual-fact"><strong>4</strong><span>种嘴替可选</span></div>
+            <div className="visual-fact"><strong>1</strong><span>张命运签可晒</span></div>
           </div>
         </div>
       </section>
@@ -71,26 +71,26 @@ export default function HomePage() {
       <section className="home-intro-row">
         <div>
           <div className="section-kicker"><Compass size={14} /> 怎么开始</div>
-          <h2 className="section-heading">三步，理清你的下一步</h2>
+          <h2 className="section-heading">测完有梗，也有点用</h2>
         </div>
-        <p className="section-note">不替你做决定，只把容易忽略的因素一起看清。</p>
+        <p className="section-note">可以转给同事互相认证，辞不辞职还是你说了算。</p>
       </section>
 
       <section className="process-grid" aria-label="测评流程">
         <article className="process-card">
-          <span className="process-number">01 / 了解现状</span>
-          <h3>说说现在的工作</h3>
-          <p>从薪资、通勤到团队氛围，回答 10 个具体问题。</p>
+            <span className="process-number">01 / 对号入座</span>
+            <h3>讲讲工位里的日常</h3>
+            <p>老板、加班、通勤和工资条，挑最像你的一项。</p>
         </article>
         <article className="process-card">
-          <span className="process-number">02 / 选择视角</span>
-          <h3>挑一种分析风格</h3>
-          <p>理性顾问、知心大姐，或你更想听的那种声音。</p>
+            <span className="process-number">02 / 选个嘴替</span>
+            <h3>想听哪种声音？</h3>
+            <p>毒舌损友、阴阳大师、专业顾问或知心大姐。</p>
         </article>
         <article className="process-card">
-          <span className="process-number">03 / 看见选项</span>
-          <h3>获得一份行动参考</h3>
-          <p>综合分析职业状态，并给出可以开始做的小建议。</p>
+            <span className="process-number">03 / 领取命运签</span>
+            <h3>拿走一条职场锐评</h3>
+            <p>看看你的辞职指数，存图发给那个天天喊离职的人。</p>
         </article>
       </section>
 
