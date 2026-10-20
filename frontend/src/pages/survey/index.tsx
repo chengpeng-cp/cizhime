@@ -1,7 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  BriefcaseBusiness,
+  Check,
+  Heart,
+  MessageCircle,
+  Scale,
+  Sparkles,
+  type LucideIcon,
+} from 'lucide-react'
 import { AGENT_STYLES, type Questionnaire } from '@/types/report'
 
 interface SingleOption {
@@ -26,8 +36,8 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'education',
     type: 'single',
-    title: '你的学历是？',
-    subtitle: '学历不代表能力，但代表起跑线',
+    title: '你的最高学历是？',
+    subtitle: '学历不是能力的全部，但会影响你面对的选项。',
     options: [
       { label: '高中及以下', value: '高中及以下' },
       { label: '大专', value: '大专' },
@@ -39,8 +49,8 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'region',
     type: 'single',
-    title: '你所在的地区是？',
-    subtitle: '地理位置决定了很多东西',
+    title: '你目前在哪个地区工作？',
+    subtitle: '城市不同，机会、成本和生活节奏也不同。',
     options: [
       { label: '一线城市', value: '一线城市' },
       { label: '新一线城市', value: '新一线城市' },
@@ -52,99 +62,98 @@ const QUESTIONS: QuestionDef[] = [
   {
     key: 'stability',
     type: 'single',
-    title: '你的工作稳定程度？',
-    subtitle: '铁饭碗还是纸饭碗？',
+    title: '你觉得现在的工作稳定吗？',
+    subtitle: '回想最近一年的变化，选择最接近的状态。',
     options: [
-      { label: '铁饭碗', value: '铁饭碗' },
-      { label: '较稳定', value: '较稳定' },
-      { label: '一般般', value: '一般般' },
-      { label: '随时可能凉', value: '随时可能凉' },
+      { label: '非常稳定', value: '铁饭碗' },
+      { label: '比较稳定', value: '较稳定' },
+      { label: '时好时坏', value: '一般般' },
+      { label: '变化很大', value: '随时可能凉' },
     ],
   },
   {
     key: 'overtimeFrequency',
     type: 'single',
-    title: '每周加班几次？',
-    subtitle: '加班是福报，问就是福报',
+    title: '你每周大约加班几次？',
+    subtitle: '按最近一个月的平均情况来选。',
     options: [
-      { label: '从不加班', value: '从不加班' },
-      { label: '1-2次', value: '1-2次' },
-      { label: '3-5次', value: '3-5次' },
-      { label: '加班是我的第二职业', value: '加班是我的第二职业' },
+      { label: '基本不加班', value: '从不加班' },
+      { label: '每周 1–2 次', value: '1-2次' },
+      { label: '每周 3–5 次', value: '3-5次' },
+      { label: '几乎每天都加班', value: '加班是我的第二职业' },
     ],
   },
   {
     key: 'commuteMinutes',
     type: 'slider',
-    title: '每天通勤多久？',
-    subtitle: '通勤是打工人的第二份工作',
+    title: '你每天通勤需要多久？',
+    subtitle: '按往返总时间估算，包含等车和换乘。',
     min: 0,
     max: 360,
     unit: '分钟',
     minLabel: '0 分钟',
-    maxLabel: '360 分钟',
+    maxLabel: '6 小时以上',
   },
   {
     key: 'salaryRange',
     type: 'single',
-    title: '月薪范围？',
-    subtitle: '谈钱不伤感情，不谈才伤',
+    title: '你的月薪大约在什么范围？',
+    subtitle: '选择税前月薪区间，帮助我们理解你的现实成本。',
     options: [
-      { label: '5k以下', value: '5k以下' },
-      { label: '5-10k', value: '5-10k' },
-      { label: '10-20k', value: '10-20k' },
-      { label: '20-50k', value: '20-50k' },
-      { label: '50k+', value: '50k+' },
+      { label: '5k 以下', value: '5k以下' },
+      { label: '5k–10k', value: '5-10k' },
+      { label: '10k–20k', value: '10-20k' },
+      { label: '20k–50k', value: '20-50k' },
+      { label: '50k 以上', value: '50k+' },
     ],
   },
   {
     key: 'salarySatisfaction',
     type: 'slider',
-    title: '对当前薪资满意吗？',
-    subtitle: '1=饿死，10=财务自由',
+    title: '你对目前的薪资满意吗？',
+    subtitle: '1 分代表很不满意，10 分代表非常满意。',
     min: 1,
     max: 10,
-    minLabel: '1=饿死',
-    maxLabel: '10=财务自由',
+    minLabel: '很不满意',
+    maxLabel: '非常满意',
   },
   {
     key: 'workEnvironment',
     type: 'single',
-    title: '办公环境如何？',
-    subtitle: '工位就是你的第二个家',
+    title: '你对办公环境感觉如何？',
+    subtitle: '包括工作空间、设备和日常工作氛围。',
     options: [
-      { label: '神仙环境', value: '神仙环境' },
-      { label: '还行', value: '还行' },
-      { label: '憋屈', value: '憋屈' },
-      { label: '工地现场', value: '工地现场' },
+      { label: '舒适自在', value: '神仙环境' },
+      { label: '整体还不错', value: '还行' },
+      { label: '有些压抑', value: '憋屈' },
+      { label: '很难适应', value: '工地现场' },
     ],
   },
   {
     key: 'colleagueRelation',
     type: 'single',
-    title: '同事相处如何？',
-    subtitle: '职场如戏，全靠演技',
+    title: '你和同事相处得怎么样？',
+    subtitle: '团队关系往往会影响每天的工作体验。',
     options: [
-      { label: '神仙同事', value: '神仙同事' },
-      { label: '普通同事', value: '普通同事' },
-      { label: '塑料同事', value: '塑料同事' },
-      { label: '宫斗现场', value: '宫斗现场' },
+      { label: '互相支持', value: '神仙同事' },
+      { label: '普通合作', value: '普通同事' },
+      { label: '有些别扭', value: '塑料同事' },
+      { label: '关系紧张', value: '宫斗现场' },
     ],
   },
   {
     key: 'bossToxicity',
     type: 'slider',
-    title: '领导的二逼程度？',
-    subtitle: '1=人间天使，10=建议报警',
+    title: '你和直属领导的合作体验如何？',
+    subtitle: '1 分代表非常顺畅，10 分代表非常困难。',
     min: 1,
     max: 10,
-    minLabel: '1=人间天使',
-    maxLabel: '10=建议报警',
+    minLabel: '非常顺畅',
+    maxLabel: '非常困难',
   },
 ]
 
 const TOTAL = QUESTIONS.length
-
 const INITIAL_ANSWERS: Questionnaire = {
   education: '',
   region: '',
@@ -158,12 +167,20 @@ const INITIAL_ANSWERS: Questionnaire = {
   bossToxicity: 5,
 }
 
+const STYLE_ICONS: Record<string, LucideIcon> = {
+  poison: MessageCircle,
+  professional: BriefcaseBusiness,
+  yinyang: Scale,
+  sister: Heart,
+}
+
 export default function SurveyPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const root = useRef<HTMLDivElement>(null)
+  const advanceTimer = useRef<number | null>(null)
 
-  // 从生成失败页返回时恢复已填写的答案，直接回到风格选择步骤
+  // 从生成失败页返回时恢复已填写的答案，直接回到风格选择步骤。
   const restore = location.state as { answers?: Questionnaire; agentStyle?: string } | null
   const [step, setStep] = useState(() => (restore?.answers ? TOTAL + 1 : 0))
   const [direction, setDirection] = useState(1)
@@ -176,200 +193,192 @@ export default function SurveyPage() {
   const isExtraStep = step === TOTAL
   const isAgentStep = step === TOTAL + 1
   const current = QUESTIONS[step]
+  const totalSteps = TOTAL + 2
+  const progress = Math.min(100, ((step + 1) / totalSteps) * 100)
 
-  // 问题切换 slide 动画
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
-      const x = direction > 0 ? 60 : -60
-      gsap.fromTo(
-        '.survey-step',
-        { x, opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
-      )
+      const x = direction > 0 ? 28 : -28
+      gsap.fromTo('.survey-step', { x, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: 'power2.out' })
     }, root)
     return () => ctx.revert()
   }, [step, direction])
 
+  useEffect(() => () => {
+    if (advanceTimer.current !== null) window.clearTimeout(advanceTimer.current)
+  }, [])
+
   const goNext = () => {
     if (step < TOTAL + 1) {
       setDirection(1)
-      setStep((s) => s + 1)
+      setStep((value) => value + 1)
     }
   }
 
   const goBack = () => {
     if (step > 0) {
+      if (advanceTimer.current !== null) window.clearTimeout(advanceTimer.current)
       setDirection(-1)
-      setStep((s) => s - 1)
+      setStep((value) => value - 1)
     }
   }
 
   const handleSingleSelect = (key: keyof Questionnaire, value: string) => {
-    setAnswers((prev) => ({ ...prev, [key]: value }))
-    // 单选题选择后自动进入下一题
-    window.setTimeout(() => goNext(), 200)
+    setAnswers((previous) => ({ ...previous, [key]: value }))
+    if (advanceTimer.current !== null) window.clearTimeout(advanceTimer.current)
+    advanceTimer.current = window.setTimeout(goNext, 360)
   }
 
   const handleSliderChange = (key: keyof Questionnaire, value: number) => {
-    setAnswers((prev) => ({ ...prev, [key]: value }))
+    setAnswers((previous) => ({ ...previous, [key]: value }))
   }
 
-  // 提交后立即进入生成页，由生成页发起请求并展示进度/重试
   const handleSubmit = () => {
     navigate('/generating', {
       state: { payload: { agentStyle, questionnaire: { ...answers, extraNote } } },
     })
   }
 
-  const TOTAL_STEPS = TOTAL + 1 // 10题 + 补充说明
-  const progress = isAgentStep ? 100 : ((step + 1) / (TOTAL_STEPS + 1)) * 100
+  const stepText = isAgentStep
+    ? '选择分析风格'
+    : isExtraStep
+      ? '补充说明'
+      : '第 ' + (step + 1) + ' / ' + TOTAL + ' 题'
 
   return (
-    <div ref={root} className="mx-auto max-w-2xl py-4">
-      {/* 进度条 */}
-      <div className="mb-8">
-        <div className="mb-2 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
-          <span>{isAgentStep ? '选择分析风格' : isExtraStep ? '补充说明' : `第 ${step + 1} / ${TOTAL} 题`}</span>
-          <span>{Math.round(progress)}%</span>
-        </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-slate-700">
-          <div
-            className="h-full rounded-full bg-amber-400 transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+    <div ref={root} className="survey-page">
+      <div className="survey-progress-head">
+        <span className="survey-progress-label"><strong>{stepText}</strong> · 让建议更贴近你的情况</span>
+        <span className="survey-progress-value">{Math.round(progress)}%</span>
+      </div>
+      <div className="progress-track" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
+        <div className="progress-fill" style={{ width: progress + '%' }} />
       </div>
 
-      {/* 返回按钮 */}
-      {step > 0 && (
-        <button
-          onClick={goBack}
-          className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 transition-colors hover:text-amber-500 dark:hover:text-amber-400"
-        >
-          <ArrowLeft size={16} /> 上一题
-        </button>
-      )}
+      <div className="survey-nav">
+        {step > 0 ? (
+          <button className="survey-back" onClick={goBack}><ArrowLeft size={15} /> 上一步</button>
+        ) : <span />}
+        <span className="survey-step-count">{String(step + 1).padStart(2, '0')} / {String(totalSteps).padStart(2, '0')}</span>
+      </div>
 
-      {/* 步骤内容 */}
       <div className="survey-step">
         {!isAgentStep && !isExtraStep && current && (
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8 dark:border-slate-700 dark:bg-slate-800/50">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">{current.title}</h2>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{current.subtitle}</p>
+          <section className="survey-card" aria-labelledby="survey-title">
+            <div className="survey-kicker">WORK &amp; LIFE / {String(step + 1).padStart(2, '0')}</div>
+            <h1 id="survey-title" className="survey-title">{current.title}</h1>
+            <p className="survey-subtitle">{current.subtitle}</p>
 
-            <div className="mt-8">
-              {current.type === 'single' && current.options && (
-                <div className="grid gap-3">
-                  {current.options.map((opt) => {
-                    const selected = answers[current.key] === opt.value
-                    return (
-                      <button
-                        key={opt.value}
-                        onClick={() => handleSingleSelect(current.key, opt.value)}
-                        className={`rounded-2xl border px-5 py-4 text-left text-lg transition-all ${
-                          selected
-                            ? 'border-amber-400 bg-amber-400/15 text-amber-600 dark:text-amber-300'
-                            : 'border-gray-300 bg-gray-100 text-slate-700 hover:border-amber-400/50 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-700/40 dark:text-slate-200 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-
-              {current.type === 'slider' && (
-                <div>
-                  <div className="mb-6 text-center">
-                    <span className="text-6xl font-black text-amber-500 dark:text-amber-400">
-                      {answers[current.key] as number}
-                    </span>
-                    {current.unit && <span className="ml-2 text-xl text-slate-500 dark:text-slate-400">{current.unit}</span>}
-                  </div>
-                  <input
-                    type="range"
-                    min={current.min}
-                    max={current.max}
-                    value={answers[current.key] as number}
-                    onChange={(e) => handleSliderChange(current.key, Number(e.target.value))}
-                    className="w-full accent-amber-400"
-                  />
-                  <div className="mt-2 flex justify-between text-xs text-slate-500">
-                    <span>{current.minLabel}</span>
-                    <span>{current.maxLabel}</span>
-                  </div>
-                  <button
-                    onClick={goNext}
-                    className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 py-3 font-bold text-slate-900 transition-colors hover:bg-amber-300"
-                  >
-                    下一题 <ArrowRight size={18} />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {isExtraStep && (
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8 dark:border-slate-700 dark:bg-slate-800/50">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">还有什么想说的？</h2>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">吐槽、抱怨、补充，随便写，AI 会一起分析</p>
-
-            <textarea
-              value={extraNote}
-              onChange={(e) => setExtraNote(e.target.value)}
-              placeholder="比如：公司天天画大饼、领导PUA、同事甩锅、想转行但不知道做什么……"
-              rows={6}
-              maxLength={500}
-              className="mt-6 w-full resize-none rounded-2xl border border-gray-300 bg-gray-100 p-4 text-slate-700 placeholder:text-slate-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 dark:border-slate-600 dark:bg-slate-700/40 dark:text-slate-200 dark:placeholder:text-slate-500"
-            />
-            <div className="mt-1 text-right text-xs text-slate-500">{extraNote.length}/500</div>
-
-            <button
-              onClick={goNext}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 py-3 font-bold text-slate-900 transition-colors hover:bg-amber-300"
-            >
-              {extraNote.trim() ? '下一步' : '跳过'} <ArrowRight size={18} />
-            </button>
-          </div>
-        )}
-
-        {isAgentStep && (
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8 dark:border-slate-700 dark:bg-slate-800/50">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">选择你的&ldquo;人生导师&rdquo;</h2>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">AI 会用这个风格来分析你</p>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {AGENT_STYLES.map((style) => {
-                const selected = agentStyle === style.id
+            <div className="option-grid">
+              {current.type === 'single' && current.options?.map((option) => {
+                const selected = answers[current.key] === option.value
                 return (
                   <button
-                    key={style.id}
-                    onClick={() => setAgentStyle(style.id)}
-                    className={`rounded-2xl border p-4 text-left transition-all ${
-                      selected
-                        ? 'border-amber-400 bg-amber-400/15'
-                        : 'border-gray-300 bg-gray-100 hover:border-amber-400/50 dark:border-slate-600 dark:bg-slate-700/40'
-                    }`}
+                    key={option.value}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => handleSingleSelect(current.key, option.value)}
+                    className={'option-button' + (selected ? ' is-selected' : '')}
                   >
-                    <div className="text-3xl">{style.emoji}</div>
-                    <div className={`mt-2 font-bold ${selected ? 'text-amber-600 dark:text-amber-300' : 'text-slate-900 dark:text-white'}`}>
-                      {style.name}
-                    </div>
-                    <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{style.description}</div>
+                    <span>{option.label}</span>
+                    <span className="option-check"><Check size={12} strokeWidth={3} /></span>
                   </button>
                 )
               })}
             </div>
 
-            <button
-              onClick={handleSubmit}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-amber-300"
-            >
-              生成报告
+            {current.type === 'slider' && (
+              <div className="slider-question">
+                <div className="slider-value">
+                  <strong>{answers[current.key] as number}</strong>
+                  {current.unit && <span>{current.unit}</span>}
+                </div>
+                <div className="range-wrap">
+                  <input
+                    aria-label={current.title}
+                    type="range"
+                    min={current.min}
+                    max={current.max}
+                    value={answers[current.key] as number}
+                    onChange={(event) => handleSliderChange(current.key, Number(event.target.value))}
+                    className="survey-range"
+                    style={{
+                      '--range-progress':
+                        (((Number(answers[current.key]) - (current.min ?? 0)) /
+                          ((current.max ?? 100) - (current.min ?? 0))) * 100) + '%',
+                    } as CSSProperties}
+                  />
+                  <div className="range-labels">
+                    <span>{current.minLabel}</span>
+                    <span>{current.maxLabel}</span>
+                  </div>
+                </div>
+                <button className="primary-button survey-continue" onClick={goNext}>
+                  下一题 <ArrowRight size={16} />
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+
+        {isExtraStep && (
+          <section className="survey-card" aria-labelledby="survey-title">
+            <div className="survey-kicker">A LITTLE MORE CONTEXT / 11</div>
+            <h1 id="survey-title" className="survey-title">还有什么想补充的吗？</h1>
+            <p className="survey-subtitle">那些没法放进选项里的事，也可以在这里说说。</p>
+            <label className="note-label-row" htmlFor="extra-note">
+              <span>补充情况</span><span>{extraNote.length} / 500</span>
+            </label>
+            <textarea
+              id="extra-note"
+              value={extraNote}
+              onChange={(event) => setExtraNote(event.target.value)}
+              placeholder="比如：正在考虑转行、近期有家庭计划，或者有一件事一直让你很纠结……"
+              rows={5}
+              maxLength={500}
+              className="survey-textarea"
+            />
+            <p className="note-hint">可以留空跳过。补充的信息会和问卷答案一起用于生成分析。</p>
+            <button className="primary-button survey-continue" onClick={goNext}>
+              继续 <ArrowRight size={16} />
             </button>
-          </div>
+          </section>
+        )}
+
+        {isAgentStep && (
+          <section className="survey-card" aria-labelledby="survey-title">
+            <div className="survey-kicker">CHOOSE YOUR PERSPECTIVE / 12</div>
+            <h1 id="survey-title" className="survey-title">你想听谁来分析？</h1>
+            <p className="survey-subtitle">选择一种表达风格，分析内容仍会根据你的回答生成。</p>
+
+            <div className="agent-grid">
+              {AGENT_STYLES.map((style) => {
+                const selected = agentStyle === style.id
+                const Icon = STYLE_ICONS[style.id] ?? Sparkles
+                return (
+                  <button
+                    key={style.id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setAgentStyle(style.id)}
+                    className={'agent-card' + (selected ? ' is-selected' : '')}
+                  >
+                    {selected && <Check className="agent-selected-mark" size={16} />}
+                    <span className="agent-card-content">
+                      <span className="agent-icon"><Icon size={17} /></span>
+                      <span className="agent-name">{style.name}</span>
+                      <span className="agent-description">{style.description}</span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <button className="primary-button agent-submit" onClick={handleSubmit}>
+              生成我的分析 <ArrowRight size={16} />
+            </button>
+          </section>
         )}
       </div>
     </div>

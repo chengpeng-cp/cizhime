@@ -1,6 +1,7 @@
 import { Suspense, useEffect, Component, type ReactNode } from 'react'
 import { BrowserRouter, useRoutes } from 'react-router-dom'
 import { Provider, useSelector } from 'react-redux'
+import { AlertCircle, RotateCcw } from 'lucide-react'
 import { store, type RootState } from './store'
 import { routes } from './router'
 
@@ -23,37 +24,17 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'var(--bg-primary, #0f172a)',
-          color: 'var(--text-primary, #f8fafc)',
-          padding: '32px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
-          <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '8px' }}>页面出了点问题</h2>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary, #94a3b8)', marginBottom: '24px' }}>
+        <div className="error-boundary">
+          <div className="error-boundary-inner">
+            <span className="state-icon"><AlertCircle size={23} /></span>
+            <h2>页面出了点问题</h2>
+            <p>
             {this.state.error?.message || '发生了未知错误'}
-          </p>
-          <button
-            onClick={this.handleReset}
-            style={{
-              padding: '10px 24px',
-              background: 'var(--accent, #e94560)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            重试
-          </button>
+            </p>
+            <button className="primary-button" onClick={this.handleReset}>
+              <RotateCcw size={15} /> 重试
+            </button>
+          </div>
         </div>
       )
     }
@@ -83,6 +64,8 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    const themeColor = document.querySelector('meta[name="theme-color"]')
+    themeColor?.setAttribute('content', theme === 'dark' ? '#111915' : '#f5f4ef')
   }, [theme])
 
   return <>{children}</>

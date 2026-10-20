@@ -7,7 +7,7 @@ export interface AppSetting {
 }
 
 const initialState: AppSetting = {
-  theme: (localStorage.getItem('theme') as 'light' | 'dark') || 'dark',
+  theme: (localStorage.getItem('theme') as 'light' | 'dark') || 'light',
   language: 'zh-CN',
   collapsed: false,
 }

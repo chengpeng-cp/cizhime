@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
 import dayjs from 'dayjs'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Clock3, Compass, Trash2 } from 'lucide-react'
 import { VERDICT_TYPES } from '@/types/report'
 import { clearHistory, getHistory, type ReportHistoryItem } from '@/utils/reportHistory'
 
-function verdictEmoji(verdict: string) {
-  if (verdict === VERDICT_TYPES.RESIGN) return '🏃'
-  if (verdict === VERDICT_TYPES.STAY) return '🛡️'
-  return '🤔'
+function verdictClass(verdict: string) {
+  if (verdict === VERDICT_TYPES.STAY) return 'stay'
+  if (verdict === VERDICT_TYPES.WAIT) return 'wait'
+  return ''
 }
 
 export default function HomePage() {
@@ -18,89 +18,115 @@ export default function HomePage() {
   const [history, setHistory] = useState<ReportHistoryItem[]>(() => getHistory())
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'back.out(1.7)' } })
-      tl.fromTo('.hero-badge', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 })
-        .fromTo('.hero-title', { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
-        .fromTo('.hero-subtitle', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.5')
-        .fromTo('.hero-cta', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, '-=0.4')
+      gsap.fromTo(
+        '.home-fade',
+        { y: 18, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.65, stagger: 0.1, ease: 'power2.out' }
+      )
     }, root)
     return () => ctx.revert()
   }, [])
 
-  // 本地历史报告淡入
-  useEffect(() => {
-    if (history.length === 0) return
-    const ctx = gsap.context(() => {
-      gsap.from('.hero-history', { y: 30, opacity: 0, duration: 0.6, delay: 0.3, ease: 'back.out(1.7)' })
-    }, root)
-    return () => ctx.revert()
-  }, [history.length])
+  const handleClearHistory = () => {
+    clearHistory()
+    setHistory([])
+  }
 
   return (
-    <div
-      ref={root}
-      className="relative flex min-h-[calc(100vh-7rem)] flex-col items-center justify-center overflow-hidden rounded-3xl px-2"
-    >
-      {/* 背景渐变光晕 */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(251,191,36,0.18),_transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 -z-10 dark:bg-gradient-to-b dark:from-slate-900/0 dark:via-slate-900/0 dark:to-slate-950/40" />
+    <div ref={root} className="home-page">
+      <section className="hero-layout">
+        <div className="hero-copy">
+          <div className="eyebrow home-fade"><span className="eyebrow-mark" /> 职业选择 · 清醒一点</div>
+          <h1 className="hero-title home-fade">辞职这件事，<br />先别急着<em>做决定。</em></h1>
+          <p className="hero-description home-fade">
+            把工作里的好与坏都摆上桌面。用一份轻松的测评，帮你理清处境、看见选择，再决定下一步。
+          </p>
+          <div className="hero-actions home-fade">
+            <button className="primary-button" onClick={() => navigate('/survey')}>
+              开始职业测评 <ArrowRight size={17} />
+            </button>
+            <span className="hero-meta"><Clock3 size={14} style={{ verticalAlign: '-2px', marginRight: 5 }} />约 3 分钟 · 10 个问题</span>
+          </div>
+        </div>
 
-      <div className="hero-badge mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-sm text-amber-600 dark:text-amber-300">
-        <Sparkles size={16} />
-        <span>AI 辅助辞职决策工具</span>
-      </div>
+        <div className="hero-visual home-fade" aria-label="职业状态分析示意">
+          <div className="visual-topline">
+            <span><i className="visual-dot" />职业状态快照</span>
+            <span>CAREER CHECK / 01</span>
+          </div>
+          <p className="visual-title">工作不该只剩下<br /><span>“要不要辞职”</span><br />这一道选择题。</p>
+          <div className="visual-orbit" aria-hidden="true">
+            <div className="visual-orbit-ring">3<small>MINUTES</small></div>
+          </div>
+          <div className="visual-facts">
+            <div className="visual-fact"><strong>10</strong><span>个真实问题</span></div>
+            <div className="visual-fact"><strong>4</strong><span>种分析视角</span></div>
+            <div className="visual-fact"><strong>1</strong><span>份专属建议</span></div>
+          </div>
+        </div>
+      </section>
 
-      <h1 className="hero-title text-center text-7xl font-black tracking-tight text-amber-500 dark:text-amber-400 sm:text-8xl">
-        辞职么
-      </h1>
+      <section className="home-intro-row">
+        <div>
+          <div className="section-kicker"><Compass size={14} /> 怎么开始</div>
+          <h2 className="section-heading">三步，理清你的下一步</h2>
+        </div>
+        <p className="section-note">不替你做决定，只把容易忽略的因素一起看清。</p>
+      </section>
 
-      <p className="hero-subtitle mt-6 text-center text-lg text-slate-600 dark:text-slate-300 sm:text-2xl">
-        AI 帮你分析该不该辞职
-      </p>
+      <section className="process-grid" aria-label="测评流程">
+        <article className="process-card">
+          <span className="process-number">01 / 了解现状</span>
+          <h3>说说现在的工作</h3>
+          <p>从薪资、通勤到团队氛围，回答 10 个具体问题。</p>
+        </article>
+        <article className="process-card">
+          <span className="process-number">02 / 选择视角</span>
+          <h3>挑一种分析风格</h3>
+          <p>理性顾问、知心大姐，或你更想听的那种声音。</p>
+        </article>
+        <article className="process-card">
+          <span className="process-number">03 / 看见选项</span>
+          <h3>获得一份行动参考</h3>
+          <p>综合分析职业状态，并给出可以开始做的小建议。</p>
+        </article>
+      </section>
 
-      <button
-        onClick={() => navigate('/survey')}
-        className="hero-cta group mt-10 inline-flex items-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-lg font-bold text-slate-900 shadow-lg shadow-amber-400/30 transition-all hover:scale-105 hover:bg-amber-300 active:scale-95"
-      >
-        开始分析
-        <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
-      </button>
-
-      {/* 本机历史报告（仅存于浏览器 localStorage） */}
       {history.length > 0 && (
-        <div className="hero-history mt-12 w-full max-w-md">
-          <div className="mb-3 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
-            <span>📋 最近生成（仅本机可见）</span>
-            <button
-              onClick={() => {
-                clearHistory()
-                setHistory([])
-              }}
-              className="text-xs transition-colors hover:text-amber-500 dark:hover:text-amber-400"
-            >
-              清除
+        <section className="history-section home-fade">
+          <div className="section-heading-row">
+            <div>
+              <div className="section-kicker">YOUR REPORTS</div>
+              <h2 className="section-heading">最近的分析</h2>
+              <p className="history-caption">这些记录只保存在当前浏览器中</p>
+            </div>
+            <button className="text-button" onClick={handleClearHistory}>
+              <Trash2 size={14} /> 清除记录
             </button>
           </div>
-          <div className="space-y-2">
+          <div className="history-list">
             {history.slice(0, 5).map((item) => (
               <button
                 key={item.shareCode}
-                onClick={() => navigate(`/report/${item.shareCode}`)}
-                className="flex w-full items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-left shadow-sm transition-all hover:border-amber-400/60 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-amber-400/40"
+                onClick={() => navigate('/report/' + item.shareCode)}
+                className="history-item"
               >
-                <span className="flex min-w-0 items-center gap-2">
-                  <span>{verdictEmoji(item.verdict)}</span>
-                  <span className="truncate text-sm font-semibold text-slate-700 dark:text-slate-200">{item.verdict}</span>
-                  <span className="text-xs text-slate-400 dark:text-slate-500">{item.shareCode}</span>
+                <span className="history-main">
+                  <i className={'verdict-dot ' + verdictClass(item.verdict)} />
+                  <span className="history-verdict">{item.verdict}</span>
+                  <span className="history-code">#{item.shareCode}</span>
                 </span>
-                <span className="flex-none text-xs text-slate-500 dark:text-slate-400">
-                  {item.score} 分 · {dayjs(item.createdAt).format('MM-DD HH:mm')}
+                <span className="history-meta">
+                  <span>{item.score} 分</span>
+                  <span>{dayjs(item.createdAt).format('MM-DD HH:mm')}</span>
+                  <ArrowUpRight size={15} />
                 </span>
               </button>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   )
